@@ -1,0 +1,20 @@
+{{
+
+
+
+
+
+
+
+
+
+
+}  }    "name": "__STORAGE_CONTAINER_NAME__"  "container": {  },    "connectionString": "__STORAGE_CONNECTION_STRING__"  "credentials": {  "type": "azureblob",  "name": "__DATASOURCE_NAME__",  "name": "__DATASOURCE_NAME__",
+  "type": "azureblob",
+  "credentials": {
+    "connectionString": "__STORAGE_CONNECTION_STRING__"
+  },
+  "container": {
+    "name": "__STORAGE_CONTAINER_NAME__"
+  }
+}

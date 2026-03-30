@@ -1,0 +1,14 @@
+{
+	"name": "__INDEXER_NAME__",
+	"dataSourceName": "__DATASOURCE_NAME__",
+	"targetIndexName": "__INDEX_NAME__",
+	"skillsetName": "__SKILLSET_NAME__",
+	"parameters": {
+		"batchSize": 1,
+		"configuration": {
+			"dataToExtract": "contentAndMetadata",
+			"parsingMode": "default",
+			"allowSkillsetToReadFileData": true
+		}
+	}
+}

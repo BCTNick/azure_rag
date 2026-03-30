@@ -32,6 +32,8 @@ from azure.search.documents.indexes.models import (
 )
 from azure.storage.blob import BlobServiceClient
 from dotenv import load_dotenv
+from src.ingester import ingestion as run_ingestion_pipeline
+from src.chat import create_or_update_agent, create_foundry_connection, chat_in_terminal
 
 
 @dataclass
@@ -55,7 +57,7 @@ class Settings:
     project_connection_name: str
     agent_name: str
     agent_model: str
-    local_blob_folder: Path
+    local_storage: Path
 
 
 def _require_env(name: str) -> str:
@@ -88,19 +90,19 @@ def load_settings() -> Settings:
         project_connection_name=os.getenv("PROJECT_CONNECTION_NAME", "search-kb-mcp"),
         agent_name=os.getenv("AGENT_NAME", "eiopa-rag-agent"),
         agent_model=os.getenv("AGENT_MODEL", "gpt-4.1-mini"),
-        local_blob_folder=Path(os.getenv("LOCAL_BLOB_FOLDER", str(root / "data" / "blob_container"))),
+        local_storage=Path(os.getenv("LOCAL_STORAGE", str(root / "data" / "blob_container"))),
     )
 
-def main() -> None:
-    settings = load_settings()
-    credential = DefaultAzureCredential()
+def main(local: bool = False, run_ingestion: bool = False) -> None:
 
-    upload_local_files_to_blob(settings)
-    create_search_index(settings)
-    create_data_source_skillset_and_indexer(settings)
-    run_indexer_and_wait(settings)
+    if local == False:
+        settings = load_settings()
+        credential = DefaultAzureCredential()
 
-    mcp_endpoint = create_knowledge_source_and_base(settings)
+    if run_ingestion == True:
+        mcp_endpoint = run_ingestion_pipeline(settings)
+    else:
+        mcp_endpoint = f"{settings.search_endpoint}/knowledgebases/{settings.knowledge_base_name}/mcp?api-version=2025-11-01-Preview"
 
     project_client = AIProjectClient(endpoint=settings.project_endpoint, credential=credential)
     create_foundry_connection(settings, credential, mcp_endpoint)
@@ -114,8 +116,10 @@ def main() -> None:
 
 
 if __name__ == "__main__":
+    local = False
+    run_ingestion = False
     try:
-        main()
+        main(local, run_ingestion)
     except KeyboardInterrupt:
         print("Interrupted by user.")
         sys.exit(1)

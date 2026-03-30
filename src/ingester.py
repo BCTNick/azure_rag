@@ -1,94 +1,93 @@
-def upload_local_files_to_blob(settings: Settings) -> None:
-    print("Uploading files from local folder to Azure Blob Storage...")
-    if not settings.local_blob_folder.exists():
-        raise FileNotFoundError(f"Local folder not found: {settings.local_blob_folder}")
+from __future__ import annotations
 
-    blob_service = BlobServiceClient.from_connection_string(settings.storage_connection_string)
-    container_client = blob_service.get_container_client(settings.storage_container_name)
-    if not container_client.exists():
-        container_client.create_container()
+import json
+import time
+from pathlib import Path
+from typing import TYPE_CHECKING, Any
 
-    files = [p for p in settings.local_blob_folder.rglob("*") if p.is_file()]
-    if not files:
-        raise ValueError(f"No files found in {settings.local_blob_folder}")
+import requests
+from azure.core.credentials import AzureKeyCredential
+from azure.core.exceptions import HttpResponseError
+from azure.search.documents.indexes import SearchIndexClient
+from azure.search.documents.indexes.models import (
+    KnowledgeBase,
+    KnowledgeRetrievalMinimalReasoningEffort,
+    KnowledgeRetrievalOutputMode,
+    KnowledgeSourceReference,
+    SearchIndexFieldReference,
+    SearchIndexKnowledgeSource,
+    SearchIndexKnowledgeSourceParameters,
+)
+from azure.storage.blob import BlobServiceClient
 
-    for path in files:
-        blob_name = str(path.relative_to(settings.local_blob_folder)).replace("\\", "/")
-        with path.open("rb") as data:
-            container_client.upload_blob(name=blob_name, data=data, overwrite=True)
-        print(f"Uploaded: {blob_name}")
+if TYPE_CHECKING:
+    from main import Settings
+
+# this function returns the path where json definitions are stored
+def _json_templates_dir() -> Path:
+    return Path(__file__).resolve().parent.parent / "input_data" / "jsons"
 
 
-def create_search_index(settings: Settings) -> None:
-    print("Creating or updating Azure AI Search index...")
-    credential = AzureKeyCredential(settings.search_admin_key)
-    index_client = SearchIndexClient(endpoint=settings.search_endpoint, credential=credential)
+def _template_tokens(settings: Settings) -> dict[str, str]:
+    return {
+        "__INDEX_NAME__": settings.index_name,
+        "__DATASOURCE_NAME__": settings.data_source_name,
+        "__SKILLSET_NAME__": settings.skillset_name,
+        "__INDEXER_NAME__": settings.indexer_name,
+        "__KNOWLEDGE_SOURCE_NAME__": settings.knowledge_source_name,
+        "__STORAGE_CONNECTION_STRING__": settings.storage_connection_string,
+        "__STORAGE_CONTAINER_NAME__": settings.storage_container_name,
+        "__AZURE_OPENAI_ENDPOINT__": settings.azure_openai_endpoint,
+        "__AZURE_OPENAI_EMBEDDING_DEPLOYMENT__": settings.azure_openai_embedding_deployment,
+        "__AZURE_OPENAI_EMBEDDING_MODEL__": settings.azure_openai_embedding_model,
+        "__AZURE_OPENAI_API_KEY__": settings.azure_openai_api_key or "",
+    }
 
-    index = SearchIndex(
-        name=settings.index_name,
-        fields=[
-            SearchField(name="id", type="Edm.String", key=True, filterable=True, sortable=True, facetable=False),
-            SearchField(name="parent_id", type="Edm.String", filterable=True, sortable=False, facetable=False),
-            SearchField(name="doc_name", type="Edm.String", searchable=True, filterable=True, sortable=True, facetable=True),
-            SearchField(name="page_num", type="Edm.Int32", filterable=True, sortable=True, facetable=True),
-            SearchField(name="chapter_num", type="Edm.Int32", filterable=True, sortable=True, facetable=True),
-            SearchField(name="article_num", type="Edm.String", searchable=True, filterable=True, sortable=True, facetable=True),
-            SearchField(name="annex_num", type="Edm.String", searchable=True, filterable=True, sortable=True, facetable=True),
-            SearchField(name="question_id", type="Edm.String", searchable=True, filterable=True, sortable=True, facetable=True),
-            SearchField(name="submitted_on", type="Edm.DateTimeOffset", filterable=True, sortable=True, facetable=True),
-            SearchField(name="answered_on", type="Edm.DateTimeOffset", filterable=True, sortable=True, facetable=True),
-            SearchField(name="regulation_reference", type="Edm.String", searchable=True, filterable=True, sortable=True, facetable=True),
-            SearchField(name="qa_topic", type="Edm.String", searchable=True, filterable=True, sortable=True, facetable=True),
-            SearchField(name="article_template", type="Edm.String", searchable=True, filterable=False, sortable=False, facetable=False),
-            SearchField(name="background_question", type="Edm.String", searchable=True, filterable=False, sortable=False, facetable=False),
-            SearchField(name="corpus", type="Edm.String", searchable=True, filterable=False, sortable=False, facetable=False),
-            SearchField(
-                name="embedding",
-                type="Collection(Edm.Single)",
-                stored=False,
-                vector_search_dimensions=3072,
-                vector_search_profile_name="hnsw_text_3_large",
-            ),
-        ],
-        vector_search=VectorSearch(
-            profiles=[
-                VectorSearchProfile(
-                    name="hnsw_text_3_large",
-                    algorithm_configuration_name="alg",
-                    vectorizer_name="azure_openai_text_3_large",
-                )
-            ],
-            algorithms=[HnswAlgorithmConfiguration(name="alg")],
-            vectorizers=[
-                AzureOpenAIVectorizer(
-                    vectorizer_name="azure_openai_text_3_large",
-                    parameters=AzureOpenAIVectorizerParameters(
-                        resource_url=settings.azure_openai_endpoint,
-                        deployment_name=settings.azure_openai_embedding_deployment,
-                        model_name=settings.azure_openai_embedding_model,
-                    ),
-                )
-            ],
-        ),
-        semantic_search=SemanticSearch(
-            default_configuration_name="semantic_config",
-            configurations=[
-                SemanticConfiguration(
-                    name="semantic_config",
-                    prioritized_fields=SemanticPrioritizedFields(
-                        title_field=SemanticField(field_name="qa_topic"),
-                        content_fields=[SemanticField(field_name="corpus")],
-                        keywords_fields=[
-                            SemanticField(field_name="regulation_reference"),
-                            SemanticField(field_name="article_num"),
-                        ],
-                    ),
-                )
-            ],
-        ),
-    )
 
-    index_client.create_or_update_index(index)
+def _replace_tokens(value: Any, tokens: dict[str, str]) -> Any:
+    if isinstance(value, dict):
+        return {k: _replace_tokens(v, tokens) for k, v in value.items()}
+    if isinstance(value, list):
+        return [_replace_tokens(item, tokens) for item in value]
+    if isinstance(value, str):
+        rendered = value
+        for token, replacement in tokens.items():
+            rendered = rendered.replace(token, replacement)
+        return rendered
+    return value
+
+
+def _load_json_template(template_name: str, settings: Settings) -> dict[str, Any]:
+    template_path = _json_templates_dir() / template_name
+    if not template_path.exists():
+        raise FileNotFoundError(f"Template not found: {template_path}")
+
+    raw = template_path.read_text(encoding="utf-8").strip()
+    if not raw:
+        raise ValueError(f"Template file is empty: {template_path}")
+
+    parsed = json.loads(raw)
+    return _replace_tokens(parsed, _template_tokens(settings))
+
+
+def _get_local_folder(settings: Settings) -> Path:
+    
+    local_folder = getattr(settings, "local_storage", None)
+    if local_folder is None:
+        raise AttributeError("Settings must define 'local_storage'.")
+    return Path(local_folder)
+
+
+def _search_rest_head_exists(settings: Settings, path: str, api_version: str = "2025-09-01") -> bool:
+    """Returns True if a Search REST resource exists, False on 404."""
+    try:
+        _search_rest_get(settings, path, api_version=api_version)
+        return True
+    except requests.HTTPError as ex:
+        response = getattr(ex, "response", None)
+        if response is not None and response.status_code == 404:
+            return False
+        raise
 
 
 def _search_rest_put(settings: Settings, path: str, payload: dict, api_version: str = "2025-09-01") -> dict:
@@ -115,87 +114,32 @@ def _search_rest_get(settings: Settings, path: str, api_version: str = "2025-09-
     return response.json() if response.text else {}
 
 
-def create_data_source_skillset_and_indexer(settings: Settings) -> None:
-    print("Creating or updating data source...")
-    data_source_payload = {
-        "name": settings.data_source_name,
-        "type": "azureblob",
-        "credentials": {"connectionString": settings.storage_connection_string},
-        "container": {"name": settings.storage_container_name},
-    }
-    _search_rest_put(settings, f"datasources/{settings.data_source_name}", data_source_payload)
-
-    print("Creating or updating skillset (split + embedding + projection)...")
-    embedding_skill: dict = {
-        "@odata.type": "#Microsoft.Skills.Text.AzureOpenAIEmbeddingSkill",
-        "name": "eiopa_embedding_skill",
-        "description": "Generate embeddings for chunked text.",
-        "context": "/document/pages/*",
-        "inputs": [{"name": "text", "source": "/document/pages/*"}],
-        "outputs": [{"name": "embedding", "targetName": "embedding"}],
-        "resourceUri": settings.azure_openai_endpoint,
-        "deploymentId": settings.azure_openai_embedding_deployment,
-        "modelName": settings.azure_openai_embedding_model,
-    }
-    if settings.azure_openai_api_key:
-        embedding_skill["apiKey"] = settings.azure_openai_api_key
-
-    skillset_payload = {
-        "name": settings.skillset_name,
-        "description": "Chunk documents and generate embeddings.",
-        "skills": [
-            {
-                "@odata.type": "#Microsoft.Skills.Text.SplitSkill",
-                "name": "eiopa_split_skill",
-                "description": "Split extracted document text into chunks.",
-                "context": "/document",
-                "textSplitMode": "pages",
-                "maximumPageLength": 2000,
-                "pageOverlapLength": 300,
-                "unit": "characters",
-                "inputs": [{"name": "text", "source": "/document/content"}],
-                "outputs": [{"name": "textItems", "targetName": "pages"}],
-            },
-            embedding_skill,
-        ],
-        "indexProjections": {
-            "selectors": [
-                {
-                    "targetIndexName": settings.index_name,
-                    "parentKeyFieldName": "parent_id",
-                    "sourceContext": "/document/pages/*",
-                    "mappings": [
-                        {"name": "corpus", "source": "/document/pages/*"},
-                        {"name": "embedding", "source": "/document/pages/*/embedding"},
-                        {"name": "doc_name", "source": "/document/metadata_storage_name"},
-                        {"name": "regulation_reference", "source": "/document/metadata_storage_path"},
-                    ],
-                }
-            ],
-            "parameters": {"projectionMode": "skipIndexingParentDocuments"},
-        },
-    }
-    _search_rest_put(settings, f"skillsets/{settings.skillset_name}", skillset_payload)
-
-    print("Creating or updating indexer...")
-    indexer_payload = {
-        "name": settings.indexer_name,
-        "dataSourceName": settings.data_source_name,
-        "targetIndexName": settings.index_name,
-        "skillsetName": settings.skillset_name,
-        "parameters": {
-            "batchSize": 1,
-            "configuration": {
-                "dataToExtract": "contentAndMetadata",
-                "parsingMode": "default",
-                "allowSkillsetToReadFileData": True,
-            },
-        },
-    }
-    _search_rest_put(settings, f"indexers/{settings.indexer_name}", indexer_payload)
 
 
-def run_indexer_and_wait(settings: Settings, timeout_seconds: int = 1800) -> None:
+def upload_local_files_to_knowledge_base(settings: Settings) -> None:
+
+    # TODO: check files 
+    print("Uploading files from local folder to Azure Blob Storage...")
+    local_folder = _get_local_folder(settings)
+    if not local_folder.exists():
+        raise FileNotFoundError(f"Local folder not found: {local_folder}")
+
+    blob_service = BlobServiceClient.from_connection_string(settings.storage_connection_string)
+    container_client = blob_service.get_container_client(settings.storage_container_name)
+    if not container_client.exists():
+        container_client.create_container()
+
+    files = [p for p in local_folder.rglob("*") if p.is_file()]
+    if not files:
+        raise ValueError(f"No files found in {local_folder}")
+
+    for path in files:
+        blob_name = str(path.relative_to(local_folder)).replace("\\", "/")
+        with path.open("rb") as data:
+            container_client.upload_blob(name=blob_name, data=data, overwrite=True)
+        print(f"Uploaded: {blob_name}")
+        
+        
     print("Running indexer...")
     _search_rest_post(settings, f"indexers/{settings.indexer_name}/run")
 
@@ -217,35 +161,118 @@ def run_indexer_and_wait(settings: Settings, timeout_seconds: int = 1800) -> Non
         print("Indexer still running... waiting 15s")
         time.sleep(15)
 
+def ensure_ingestion_resources(settings: Settings) -> str:
 
-def create_knowledge_source_and_base(settings: Settings) -> str:
-    print("Creating or updating knowledge source and knowledge base...")
+    # Blob container inside a storage account
+    blob_service = BlobServiceClient.from_connection_string(settings.storage_connection_string)
+    container_client = blob_service.get_container_client(settings.storage_container_name)
+    
+    if not container_client.exists():
+        print("Creating blob container...")
+        blob_service_client = BlobServiceClient.from_connection_string(settings.storage_connection_string)
+        container_client = blob_service_client.get_container_client(settings.storage_container_name)
+        try:
+            container_client.create_container()
+            print(f"Blob container '{settings.storage_container_name}' created.")
+        except Exception as e:
+            print(f"Blob container '{settings.storage_container_name}' failed to create: {e}")
+    else: print(f"Blob container '{settings.storage_container_name}' already exists.")
+
+    # Check existence of Search resources (index, datasource, skillset, indexer)
+    index_exists = _search_rest_head_exists(settings, f"indexes/{settings.index_name}")
+    datasource_exists = _search_rest_head_exists(settings, f"datasources/{settings.data_source_name}")
+    skillset_exists = _search_rest_head_exists(settings, f"skillsets/{settings.skillset_name}")
+    indexer_exists = _search_rest_head_exists(settings, f"indexers/{settings.indexer_name}")
+
+    # Create if missing
+    if not index_exists:
+        print("Creating Azure AI Search index...")
+        payload = _load_json_template("index.json", settings)
+        _search_rest_put(settings, f"indexes/{settings.index_name}", payload)
+
+    if not (datasource_exists and skillset_exists and indexer_exists):
+        print("Creating data source...")
+        data_source_payload = _load_json_template("datasource.json", settings)
+        _search_rest_put(settings, f"datasources/{settings.data_source_name}", data_source_payload)
+
+        print("Creating skillset (split + embedding + projection)...")
+        skillset_payload = _load_json_template("skillset.json", settings)
+        if not settings.azure_openai_api_key:
+            for skill in skillset_payload.get("skills", []):
+                if isinstance(skill, dict) and skill.get("@odata.type") == "#Microsoft.Skills.Text.AzureOpenAIEmbeddingSkill":
+                    skill.pop("apiKey", None)
+        _search_rest_put(settings, f"skillsets/{settings.skillset_name}", skillset_payload)
+
+        print("Creating indexer...")
+        indexer_payload = _load_json_template("indexer.json", settings)
+        _search_rest_put(settings, f"indexers/{settings.indexer_name}", indexer_payload)
+
+    # Index client is used for knowledge base/resource management which is not yet supported in Search REST API
     index_client = SearchIndexClient(
         endpoint=settings.search_endpoint,
         credential=AzureKeyCredential(settings.search_admin_key),
     )
 
-    ks = SearchIndexKnowledgeSource(
-        name=settings.knowledge_source_name,
-        description="Knowledge source for EIOPA documents.",
-        search_index_parameters=SearchIndexKnowledgeSourceParameters(
-            search_index_name=settings.index_name,
-            source_data_fields=[
-                SearchIndexFieldReference(name="id"),
-                SearchIndexFieldReference(name="doc_name"),
-                SearchIndexFieldReference(name="page_num"),
-                SearchIndexFieldReference(name="corpus"),
-            ],
-        ),
-    )
-    index_client.create_or_update_knowledge_source(knowledge_source=ks)
+    try:
+        index_client.get_knowledge_source(settings.knowledge_source_name)
+        knowledge_source = True
+    except HttpResponseError as ex:
+        if ex.status_code == 404:
+            knowledge_source =  False
 
-    kb = KnowledgeBase(
-        name=settings.knowledge_base_name,
-        knowledge_sources=[KnowledgeSourceReference(name=settings.knowledge_source_name)],
-        output_mode=KnowledgeRetrievalOutputMode.EXTRACTIVE_DATA,
-        retrieval_reasoning_effort=KnowledgeRetrievalMinimalReasoningEffort(),
-    )
-    index_client.create_or_update_knowledge_base(knowledge_base=kb)
+    try:
+        index_client.get_knowledge_base(settings.knowledge_base_name)
+        knowledge_base = True
+    except HttpResponseError as ex:
+        if ex.status_code == 404:
+            knowledge_base = False
+        else:
+            raise
+
+    if not (knowledge_source and knowledge_base):
+        print("Creating or updating knowledge source and knowledge base...")
+        index_client = SearchIndexClient(
+            endpoint=settings.search_endpoint,
+            credential=AzureKeyCredential(settings.search_admin_key),
+        )
+
+        knowledge_source_payload = _load_json_template("knowledge_source.json", settings)
+        search_index_params = knowledge_source_payload["search_index_parameters"]
+        source_data_fields = [
+            SearchIndexFieldReference(name=field_name)
+            for field_name in search_index_params.get("source_data_fields", [])
+        ]
+
+        ks = SearchIndexKnowledgeSource(
+            name=knowledge_source_payload["name"],
+            description=knowledge_source_payload.get("description"),
+            search_index_parameters=SearchIndexKnowledgeSourceParameters(
+                search_index_name=search_index_params["search_index_name"],
+                source_data_fields=source_data_fields,
+            ),
+        )
+        index_client.create_or_update_knowledge_source(knowledge_source=ks)
+
+        kb = KnowledgeBase(
+            name=settings.knowledge_base_name,
+            knowledge_sources=[KnowledgeSourceReference(name=settings.knowledge_source_name)],
+            output_mode=KnowledgeRetrievalOutputMode.EXTRACTIVE_DATA,
+            retrieval_reasoning_effort=KnowledgeRetrievalMinimalReasoningEffort(),
+        )
+        index_client.create_or_update_knowledge_base(knowledge_base=kb)
+
+        return f"{settings.search_endpoint}/knowledgebases/{settings.knowledge_base_name}/mcp?api-version=2025-11-01-Preview"
 
     return f"{settings.search_endpoint}/knowledgebases/{settings.knowledge_base_name}/mcp?api-version=2025-11-01-Preview"
+
+
+def ingestion(settings: Settings) -> str:
+    """End-to-end ingestion entry point.
+
+    1) Ensure required Azure resources exist.
+    2) Upload and index local content that is nor already part of the knowledge base
+    3) Return MCP endpoint for the created/existing knowledge base.
+    """
+    mcp_endpoint = ensure_ingestion_resources(settings)
+    upload_local_files_to_knowledge_base(settings)
+    return mcp_endpoint

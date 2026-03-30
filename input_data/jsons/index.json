@@ -1,0 +1,180 @@
+{
+	"name": "__INDEX_NAME__",
+	"fields": [
+		{
+			"name": "id",
+			"type": "Edm.String",
+			"key": true,
+			"filterable": true,
+			"sortable": true,
+			"facetable": false
+		},
+		{
+			"name": "parent_id",
+			"type": "Edm.String",
+			"filterable": true,
+			"sortable": false,
+			"facetable": false
+		},
+		{
+			"name": "doc_name",
+			"type": "Edm.String",
+			"searchable": true,
+			"filterable": true,
+			"sortable": true,
+			"facetable": true
+		},
+		{
+			"name": "page_num",
+			"type": "Edm.Int32",
+			"filterable": true,
+			"sortable": true,
+			"facetable": true
+		},
+		{
+			"name": "chapter_num",
+			"type": "Edm.Int32",
+			"filterable": true,
+			"sortable": true,
+			"facetable": true
+		},
+		{
+			"name": "article_num",
+			"type": "Edm.String",
+			"searchable": true,
+			"filterable": true,
+			"sortable": true,
+			"facetable": true
+		},
+		{
+			"name": "annex_num",
+			"type": "Edm.String",
+			"searchable": true,
+			"filterable": true,
+			"sortable": true,
+			"facetable": true
+		},
+		{
+			"name": "question_id",
+			"type": "Edm.String",
+			"searchable": true,
+			"filterable": true,
+			"sortable": true,
+			"facetable": true
+		},
+		{
+			"name": "submitted_on",
+			"type": "Edm.DateTimeOffset",
+			"filterable": true,
+			"sortable": true,
+			"facetable": true
+		},
+		{
+			"name": "answered_on",
+			"type": "Edm.DateTimeOffset",
+			"filterable": true,
+			"sortable": true,
+			"facetable": true
+		},
+		{
+			"name": "regulation_reference",
+			"type": "Edm.String",
+			"searchable": true,
+			"filterable": true,
+			"sortable": true,
+			"facetable": true
+		},
+		{
+			"name": "qa_topic",
+			"type": "Edm.String",
+			"searchable": true,
+			"filterable": true,
+			"sortable": true,
+			"facetable": true
+		},
+		{
+			"name": "article_template",
+			"type": "Edm.String",
+			"searchable": true,
+			"filterable": false,
+			"sortable": false,
+			"facetable": false
+		},
+		{
+			"name": "background_question",
+			"type": "Edm.String",
+			"searchable": true,
+			"filterable": false,
+			"sortable": false,
+			"facetable": false
+		},
+		{
+			"name": "corpus",
+			"type": "Edm.String",
+			"searchable": true,
+			"filterable": false,
+			"sortable": false,
+			"facetable": false
+		},
+		{
+			"name": "embedding",
+			"type": "Collection(Edm.Single)",
+			"searchable": true,
+			"retrievable": false,
+			"dimensions": 3072,
+			"vectorSearchProfile": "hnsw_text_3_large"
+		}
+	],
+	"vectorSearch": {
+		"profiles": [
+			{
+				"name": "hnsw_text_3_large",
+				"algorithm": "alg",
+				"vectorizer": "azure_openai_text_3_large"
+			}
+		],
+		"algorithms": [
+			{
+				"name": "alg",
+				"kind": "hnsw"
+			}
+		],
+		"vectorizers": [
+			{
+				"name": "azure_openai_text_3_large",
+				"kind": "azureOpenAI",
+				"azureOpenAIParameters": {
+					"resourceUri": "__AZURE_OPENAI_ENDPOINT__",
+					"deploymentId": "__AZURE_OPENAI_EMBEDDING_DEPLOYMENT__",
+					"modelName": "__AZURE_OPENAI_EMBEDDING_MODEL__"
+				}
+			}
+		]
+	},
+	"semantic": {
+		"defaultConfiguration": "semantic_config",
+		"configurations": [
+			{
+				"name": "semantic_config",
+				"prioritizedFields": {
+					"titleField": {
+						"fieldName": "qa_topic"
+					},
+					"prioritizedContentFields": [
+						{
+							"fieldName": "corpus"
+						}
+					],
+					"prioritizedKeywordsFields": [
+						{
+							"fieldName": "regulation_reference"
+						},
+						{
+							"fieldName": "article_num"
+						}
+					]
+				}
+			}
+		]
+	}
+}

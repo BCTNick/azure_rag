@@ -1,0 +1,13 @@
+{
+  "name": "__KNOWLEDGE_SOURCE_NAME__",
+  "description": "Knowledge source for EIOPA documents.",
+  "search_index_parameters": {
+    "search_index_name": "__INDEX_NAME__",
+    "source_data_fields": [
+      "id",
+      "doc_name",
+      "page_num",
+      "corpus"
+    ]
+  }
+}

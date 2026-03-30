@@ -1,0 +1,80 @@
+{
+	"name": "__SKILLSET_NAME__",
+	"description": "Chunk documents and generate embeddings.",
+	"skills": [
+		{
+			"@odata.type": "#Microsoft.Skills.Text.SplitSkill",
+			"name": "eiopa_split_skill",
+			"description": "Split extracted document text into chunks.",
+			"context": "/document",
+			"textSplitMode": "pages",
+			"maximumPageLength": 2000,
+			"pageOverlapLength": 300,
+			"unit": "characters",
+			"inputs": [
+				{
+					"name": "text",
+					"source": "/document/content"
+				}
+			],
+			"outputs": [
+				{
+					"name": "textItems",
+					"targetName": "pages"
+				}
+			]
+		},
+		{
+			"@odata.type": "#Microsoft.Skills.Text.AzureOpenAIEmbeddingSkill",
+			"name": "eiopa_embedding_skill",
+			"description": "Generate embeddings for chunked text.",
+			"context": "/document/pages/*",
+			"inputs": [
+				{
+					"name": "text",
+					"source": "/document/pages/*"
+				}
+			],
+			"outputs": [
+				{
+					"name": "embedding",
+					"targetName": "embedding"
+				}
+			],
+			"resourceUri": "__AZURE_OPENAI_ENDPOINT__",
+			"deploymentId": "__AZURE_OPENAI_EMBEDDING_DEPLOYMENT__",
+			"modelName": "__AZURE_OPENAI_EMBEDDING_MODEL__",
+			"apiKey": "__AZURE_OPENAI_API_KEY__"
+		}
+	],
+	"indexProjections": {
+		"selectors": [
+			{
+				"targetIndexName": "__INDEX_NAME__",
+				"parentKeyFieldName": "parent_id",
+				"sourceContext": "/document/pages/*",
+				"mappings": [
+					{
+						"name": "corpus",
+						"source": "/document/pages/*"
+					},
+					{
+						"name": "embedding",
+						"source": "/document/pages/*/embedding"
+					},
+					{
+						"name": "doc_name",
+						"source": "/document/metadata_storage_name"
+					},
+					{
+						"name": "regulation_reference",
+						"source": "/document/metadata_storage_path"
+					}
+				]
+			}
+		],
+		"parameters": {
+			"projectionMode": "skipIndexingParentDocuments"
+		}
+	}
+}
