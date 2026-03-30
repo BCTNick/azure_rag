@@ -1,0 +1,44 @@
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage*
+htmlcov/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Environment and secrets
+.env
+.env.*
+*.env
+local.settings.json
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDE/editor
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Local/generated data
+output_data/
+local_storage/
+input_data/input/
+
+# External reference repo (not part of this project)
+azure-search-python-samples/
