@@ -1,39 +1,11 @@
 import os
 import sys
-import time
 from dataclasses import dataclass
 from pathlib import Path
 
-import requests
-from azure.ai.projects import AIProjectClient
-from azure.ai.projects.models import MCPTool, PromptAgentDefinition
-from azure.core.credentials import AzureKeyCredential
-from azure.identity import DefaultAzureCredential, get_bearer_token_provider
-from azure.search.documents.indexes import SearchIndexClient
-from azure.search.documents.indexes.models import (
-    AzureOpenAIVectorizer,
-    AzureOpenAIVectorizerParameters,
-    HnswAlgorithmConfiguration,
-    KnowledgeBase,
-    KnowledgeRetrievalMinimalReasoningEffort,
-    KnowledgeRetrievalOutputMode,
-    KnowledgeSourceReference,
-    SearchField,
-    SearchIndex,
-    SearchIndexFieldReference,
-    SearchIndexKnowledgeSource,
-    SearchIndexKnowledgeSourceParameters,
-    SemanticConfiguration,
-    SemanticField,
-    SemanticPrioritizedFields,
-    SemanticSearch,
-    VectorSearch,
-    VectorSearchProfile,
-)
-from azure.storage.blob import BlobServiceClient
 from dotenv import load_dotenv
-from src.ingester import ingestion as run_ingestion_pipeline
-from src.chat import create_or_update_agent, create_foundry_connection, chat_in_terminal
+from src.ingester import run_ingestion_pipeline
+from src.chat import chat_in_terminal
 
 
 @dataclass
@@ -49,14 +21,11 @@ class Settings:
     azure_openai_endpoint: str
     azure_openai_embedding_deployment: str
     azure_openai_embedding_model: str
+    azure_openai_embedding_dimensions: int
+    azure_openai_chat_deployment: str
     azure_openai_api_key: str | None
     storage_connection_string: str
     storage_container_name: str
-    project_endpoint: str
-    project_resource_id: str
-    project_connection_name: str
-    agent_name: str
-    agent_model: str
     local_storage: Path
 
 
@@ -67,10 +36,70 @@ def _require_env(name: str) -> str:
     return value
 
 
-def load_settings() -> Settings:
+def _normalize_azure_openai_endpoint(raw_endpoint: str) -> str:
+    endpoint = raw_endpoint.strip().rstrip("/")
+    lower = endpoint.lower()
+    if lower.endswith("/openai/v1"):
+        return endpoint[:-10]
+    if lower.endswith("/openai"):
+        return endpoint[:-7]
+    return endpoint
+
+
+def _as_bool(value: str | None, default: bool = False) -> bool:
+    if value is None:
+        return default
+    return value.strip().lower() in {"1", "true", "yes", "y", "on"}
+
+
+def _resolve_storage_connection_string() -> str:
+    """Returns storage connection string from either direct value or account credentials."""
+    direct = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
+    if direct:
+        return direct
+
+    account_name = os.getenv("AZURE_STORAGE_ACCOUNT_NAME")
+    account_key = os.getenv("AZURE_STORAGE_ACCOUNT_KEY")
+    if account_name and account_key:
+        protocol = os.getenv("AZURE_STORAGE_PROTOCOL", "https")
+        endpoint_suffix = os.getenv("AZURE_STORAGE_ENDPOINT_SUFFIX", "core.windows.net")
+        return (
+            f"DefaultEndpointsProtocol={protocol};"
+            f"AccountName={account_name};"
+            f"AccountKey={account_key};"
+            f"EndpointSuffix={endpoint_suffix}"
+        )
+
+    raise ValueError(
+        "Missing storage configuration: set AZURE_STORAGE_CONNECTION_STRING "
+        "or both AZURE_STORAGE_ACCOUNT_NAME and AZURE_STORAGE_ACCOUNT_KEY"
+    )
+
+
+def _resolve_embedding_dimensions() -> int:
+    # Hardcoded to ADA-compatible embedding width.
+    return 1536
+
+
+def _validate_embedding_configuration(deployment_name: str, model_name: str) -> None:
+    deployment = deployment_name.strip().lower()
+    model = model_name.strip().lower()
+    if "ada-002" in deployment and model != "text-embedding-ada-002":
+        raise ValueError(
+            "Embedding deployment/model mismatch: deployment appears to be 'text-embedding-ada-002' "
+            "but AZURE_OPENAI_EMBEDDING_MODEL is not 'text-embedding-ada-002'. "
+            "Use a text-embedding-3-* deployment or update model/dimensions to ada-002-compatible values."
+        )
+
+def main() -> None:
+    # Load settings from environment variables
     load_dotenv()
     root = Path(__file__).resolve().parent
-    return Settings(
+    run_ingestion = _as_bool(os.getenv("RUN_INGESTION"), default=True)
+    embedding_deployment = _require_env("AZURE_OPENAI_EMBEDDING_DEPLOYMENT")
+    embedding_model = os.getenv("AZURE_OPENAI_EMBEDDING_MODEL", "text-embedding-3-large")
+    _validate_embedding_configuration(embedding_deployment, embedding_model)
+    settings = Settings(
         search_endpoint=_require_env("AZURE_SEARCH_ENDPOINT").rstrip("/"),
         search_admin_key=_require_env("AZURE_SEARCH_ADMIN_KEY"),
         index_name=os.getenv("AZURE_SEARCH_INDEX_NAME", "eiopa-rag-index"),
@@ -79,47 +108,28 @@ def load_settings() -> Settings:
         indexer_name=os.getenv("AZURE_SEARCH_INDEXER_NAME", "eiopa-rag-indexer"),
         knowledge_source_name=os.getenv("AZURE_SEARCH_KNOWLEDGE_SOURCE_NAME", "eiopa-rag-ks"),
         knowledge_base_name=os.getenv("AZURE_SEARCH_KNOWLEDGE_BASE_NAME", "eiopa-rag-kb"),
-        azure_openai_endpoint=_require_env("AZURE_OPENAI_ENDPOINT").rstrip("/"),
-        azure_openai_embedding_deployment=_require_env("AZURE_OPENAI_EMBEDDING_DEPLOYMENT"),
-        azure_openai_embedding_model=os.getenv("AZURE_OPENAI_EMBEDDING_MODEL", "text-embedding-3-large"),
+        azure_openai_endpoint=_normalize_azure_openai_endpoint(_require_env("AZURE_OPENAI_ENDPOINT")),
+        azure_openai_embedding_deployment=embedding_deployment,
+        azure_openai_embedding_model=embedding_model,
+        azure_openai_embedding_dimensions=_resolve_embedding_dimensions(),
+        azure_openai_chat_deployment=os.getenv("AZURE_OPENAI_CHAT_DEPLOYMENT", "gpt-4.1-mini"),
         azure_openai_api_key=os.getenv("AZURE_OPENAI_API_KEY"),
-        storage_connection_string=_require_env("AZURE_STORAGE_CONNECTION_STRING"),
+        storage_connection_string=_resolve_storage_connection_string(),
         storage_container_name=os.getenv("AZURE_STORAGE_CONTAINER_NAME", "blob-container"),
-        project_endpoint=_require_env("PROJECT_ENDPOINT"),
-        project_resource_id=_require_env("PROJECT_RESOURCE_ID"),
-        project_connection_name=os.getenv("PROJECT_CONNECTION_NAME", "search-kb-mcp"),
-        agent_name=os.getenv("AGENT_NAME", "eiopa-rag-agent"),
-        agent_model=os.getenv("AGENT_MODEL", "gpt-4.1-mini"),
         local_storage=Path(os.getenv("LOCAL_STORAGE", str(root / "data" / "blob_container"))),
     )
 
-def main(local: bool = False, run_ingestion: bool = False) -> None:
+    # If enabled in the environment variables, run the ingestion pipeline
+    if run_ingestion:
+        run_ingestion_pipeline(settings)
 
-    if local == False:
-        settings = load_settings()
-        credential = DefaultAzureCredential()
-
-    if run_ingestion == True:
-        mcp_endpoint = run_ingestion_pipeline(settings)
-    else:
-        mcp_endpoint = f"{settings.search_endpoint}/knowledgebases/{settings.knowledge_base_name}/mcp?api-version=2025-11-01-Preview"
-
-    project_client = AIProjectClient(endpoint=settings.project_endpoint, credential=credential)
-    create_foundry_connection(settings, credential, mcp_endpoint)
-    agent = create_or_update_agent(settings, project_client, mcp_endpoint)
-
-    print(
-        "Pipeline ready. Indexed data from local folder to Search, created knowledge base, "
-        "and connected Foundry agent."
-    )
-    chat_in_terminal(project_client, agent)
+    print("Pipeline ready. Starting direct key-based chat mode.")
+    chat_in_terminal(settings)
 
 
 if __name__ == "__main__":
-    local = False
-    run_ingestion = False
     try:
-        main(local, run_ingestion)
+        main()
     except KeyboardInterrupt:
         print("Interrupted by user.")
         sys.exit(1)

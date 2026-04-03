@@ -37,7 +37,8 @@ Thumbs.db
 
 # Local/generated data
 output_data/
-local_storage/
 
 # External reference repo (not part of this project)
 azure-search-python-samples/
+latex/
+run_chat - clean.py

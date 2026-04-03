@@ -1,6 +1,4 @@
-azure-ai-projects==2.0.0b1
 azure-search-documents==11.7.0b2
-azure-identity
 azure-storage-blob
 python-dotenv
 requests

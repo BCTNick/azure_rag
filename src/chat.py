@@ -1,79 +1,149 @@
-def create_foundry_connection(settings: Settings, credential: DefaultAzureCredential, mcp_endpoint: str) -> None:
-    print("Creating or updating Foundry project connection for MCP knowledge base...")
-    token_provider = get_bearer_token_provider(credential, "https://management.azure.com/.default")
-    headers = {"Authorization": f"Bearer {token_provider()}"}
+from __future__ import annotations
 
-    response = requests.put(
-        (
-            f"https://management.azure.com{settings.project_resource_id}/connections/"
-            f"{settings.project_connection_name}?api-version=2025-10-01-preview"
-        ),
-        headers=headers,
-        json={
-            "name": settings.project_connection_name,
-            "type": "Microsoft.MachineLearningServices/workspaces/connections",
-            "properties": {
-                "authType": "ProjectManagedIdentity",
-                "category": "RemoteTool",
-                "target": mcp_endpoint,
-                "isSharedToAll": True,
-                "audience": "https://search.azure.com/",
-                "metadata": {"ApiType": "Azure"},
-            },
+from typing import TYPE_CHECKING, Any
+
+import requests
+from azure.core.credentials import AzureKeyCredential
+from azure.search.documents import SearchClient
+from azure.search.documents.models import VectorizedQuery
+
+if TYPE_CHECKING:
+    from main import Settings
+
+
+def _openai_deployment_url(endpoint: str, deployment: str, operation: str) -> str:
+    return f"{endpoint}/openai/deployments/{deployment}/{operation}?api-version=2024-10-21"
+
+
+def _create_embedding(settings: Settings, text: str) -> list[float]:
+    if not settings.azure_openai_api_key:
+        raise ValueError("AZURE_OPENAI_API_KEY is required for direct chat mode.")
+
+    url = _openai_deployment_url(
+        settings.azure_openai_endpoint,
+        settings.azure_openai_embedding_deployment,
+        "embeddings",
+    )
+    response = requests.post(
+        url,
+        headers={
+            "Content-Type": "application/json",
+            "api-key": settings.azure_openai_api_key,
         },
+        json={"input": text},
         timeout=120,
     )
     response.raise_for_status()
+    data = response.json()
+    return data["data"][0]["embedding"]
 
 
-def create_or_update_agent(
-    settings: Settings,
-    project_client: AIProjectClient,
-    mcp_endpoint: str,
-) -> object:
-    print("Creating or updating Foundry agent...")
-    instructions = (
-        "You are a helpful assistant that must use the knowledge base for every answer. "
-        "Never answer from your own knowledge. "
-        "If the knowledge base has no answer, respond with 'I don't know'. "
-        "Always include citations from retrieved sources."
+def _retrieve_context(settings: Settings, query: str, top_k: int = 5) -> str:
+    search_client = SearchClient(
+        endpoint=settings.search_endpoint,
+        index_name=settings.index_name,
+        credential=AzureKeyCredential(settings.search_admin_key),
     )
 
-    mcp_tool = MCPTool(
-        server_label="knowledge-base",
-        server_url=mcp_endpoint,
-        require_approval="never",
-        allowed_tools=["knowledge_base_retrieve"],
-        project_connection_id=settings.project_connection_name,
+    vector = _create_embedding(settings, query)
+    vector_query = VectorizedQuery(
+        vector=vector,
+        k_nearest_neighbors=10,
+        fields="embedding",
+    )
+    results = search_client.search(
+        search_text=query,
+        vector_queries=[vector_query],
+        select=["doc_name", "corpus", "regulation_reference", "article_num", "page_num"],
+        top=top_k,
     )
 
-    return project_client.agents.create_version(
-        agent_name=settings.agent_name,
-        definition=PromptAgentDefinition(
-            model=settings.agent_model,
-            instructions=instructions,
-            tools=[mcp_tool],
-        ),
+    chunks: list[str] = []
+    for idx, result in enumerate(results, start=1):
+        doc_name = result.get("doc_name") or "unknown"
+        page_num = result.get("page_num")
+        reference = result.get("regulation_reference")
+        article_num = result.get("article_num")
+        corpus = result.get("corpus") or ""
+        chunks.append(
+            f"[{idx}] doc={doc_name} page={page_num} article={article_num} ref={reference}\n{corpus}"
+        )
+
+    if not chunks:
+        return "No relevant context retrieved from Azure AI Search."
+    return "\n\n".join(chunks)
+
+
+def _extract_assistant_text(response_json: dict[str, Any]) -> str:
+    choices = response_json.get("choices", [])
+    if not choices:
+        return ""
+    message = choices[0].get("message", {})
+    content = message.get("content", "")
+    if isinstance(content, str):
+        return content.strip()
+    if isinstance(content, list):
+        parts = []
+        for item in content:
+            if isinstance(item, dict) and item.get("type") == "text":
+                parts.append(item.get("text", ""))
+        return "\n".join(parts).strip()
+    return str(content).strip()
+
+
+def chat_in_terminal(settings: Settings) -> None:
+    if not settings.azure_openai_api_key:
+        raise ValueError("AZURE_OPENAI_API_KEY is required for direct chat mode")
+
+    print("Starting direct key-based chat. Type 'exit' to stop or 'clear' to reset context.")
+    system_prompt = (
+        "You are a helpful assistant. Use only the retrieved context to answer. "
+        "If context is insufficient, respond with 'I don't know'. "
+        "Cite the source chunk numbers in square brackets like [1], [2]."
     )
-
-
-def chat_in_terminal(project_client: AIProjectClient, agent: object) -> None:
-    print("Starting terminal chat. Type 'exit' to stop.")
-    openai_client = project_client.get_openai_client()
-    conversation = openai_client.conversations.create()
+    history: list[dict[str, str]] = []
 
     while True:
         user_text = input("You: ").strip()
-        if user_text.lower() in {"exit", "quit", "q"}:
+        normalized = user_text.lower()
+        if normalized in {"exit", "quit", "q"}:
             print("Bye.")
             return
+        if normalized == "clear":
+            history.clear()
+            print("Conversation context cleared.")
+            continue
         if not user_text:
             continue
 
-        response = openai_client.responses.create(
-            conversation=conversation.id,
-            tool_choice="required",
-            input=user_text,
-            extra_body={"agent": {"name": agent.name, "type": "agent_reference"}},
+        context_text = _retrieve_context(settings, user_text)
+        augmented_user = (
+            f"Question:\n{user_text}\n\n"
+            f"Retrieved context:\n{context_text}\n\n"
+            "Answer using only retrieved context."
         )
-        print(f"Assistant: {response.output_text}\n")
+
+        messages: list[dict[str, str]] = [{"role": "system", "content": system_prompt}]
+        messages.extend(history[-8:])
+        messages.append({"role": "user", "content": augmented_user})
+
+        url = _openai_deployment_url(
+            settings.azure_openai_endpoint,
+            settings.azure_openai_chat_deployment,
+            "chat/completions",
+        )
+        response = requests.post(
+            url,
+            headers={
+                "Content-Type": "application/json",
+                "api-key": settings.azure_openai_api_key,
+            },
+            json={"messages": messages, "temperature": 0.1},
+            timeout=120,
+        )
+        response.raise_for_status()
+        assistant_text = _extract_assistant_text(response.json())
+        print(f"Assistant: {assistant_text}\n")
+
+        history.append({"role": "user", "content": user_text})
+        history.append({"role": "assistant", "content": assistant_text})

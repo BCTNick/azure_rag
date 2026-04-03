@@ -5,6 +5,8 @@
 			"name": "id",
 			"type": "Edm.String",
 			"key": true,
+			"searchable": true,
+			"analyzer": "keyword",
 			"filterable": true,
 			"sortable": true,
 			"facetable": false
@@ -12,6 +14,8 @@
 		{
 			"name": "parent_id",
 			"type": "Edm.String",
+			"searchable": true,
+			"analyzer": "keyword",
 			"filterable": true,
 			"sortable": false,
 			"facetable": false
@@ -121,16 +125,16 @@
 			"type": "Collection(Edm.Single)",
 			"searchable": true,
 			"retrievable": false,
-			"dimensions": 3072,
-			"vectorSearchProfile": "hnsw_text_3_large"
+			"dimensions": "__AZURE_OPENAI_EMBEDDING_DIMENSIONS__",
+			"vectorSearchProfile": "hnsw_embedding"
 		}
 	],
 	"vectorSearch": {
 		"profiles": [
 			{
-				"name": "hnsw_text_3_large",
+				"name": "hnsw_embedding",
 				"algorithm": "alg",
-				"vectorizer": "azure_openai_text_3_large"
+				"vectorizer": "azure_openai_embedding"
 			}
 		],
 		"algorithms": [
@@ -141,7 +145,7 @@
 		],
 		"vectorizers": [
 			{
-				"name": "azure_openai_text_3_large",
+				"name": "azure_openai_embedding",
 				"kind": "azureOpenAI",
 				"azureOpenAIParameters": {
 					"resourceUri": "__AZURE_OPENAI_ENDPOINT__",

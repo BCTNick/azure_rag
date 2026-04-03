@@ -10,7 +10,6 @@
 			"textSplitMode": "pages",
 			"maximumPageLength": 2000,
 			"pageOverlapLength": 300,
-			"unit": "characters",
 			"inputs": [
 				{
 					"name": "text",
