@@ -406,7 +406,7 @@ def run_ingestion_pipeline(settings: Settings) -> str:
     # Step 1: Ensure required Azure resources exist.
     mcp_endpoint = ensure_ingestion_resources(settings)
 
-    # Step 2:If the index already has documents, we assume ingestion has already been done and skip to avoid duplicates.
+    # Step 2: If the index already has documents, we assume ingestion has already been done and skip to avoid duplicates.
     # TODO: In a production scenario, you would want a more robust way to determine if ingestion is needed, and to handle updates to the content over time.
     if _index_has_documents(settings):
         print("Index already contains documents. Skipping upload and indexing to avoid duplicates.")

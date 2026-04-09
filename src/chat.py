@@ -11,19 +11,12 @@ if TYPE_CHECKING:
     from main import Settings
 
 
-def _openai_deployment_url(endpoint: str, deployment: str, operation: str) -> str:
-    return f"{endpoint}/openai/deployments/{deployment}/{operation}?api-version=2024-10-21"
-
-
 def _create_embedding(settings: Settings, text: str) -> list[float]:
     if not settings.azure_openai_api_key:
         raise ValueError("AZURE_OPENAI_API_KEY is required for direct chat mode.")
 
-    url = _openai_deployment_url(
-        settings.azure_openai_endpoint,
-        settings.azure_openai_embedding_deployment,
-        "embeddings",
-    )
+    url = f"{settings.azure_openai_endpoint[:-3]}/deployments/{settings.azure_openai_embedding_deployment}/embeddings?api-version=2024-10-21"
+
     response = requests.post(
         url,
         headers={
@@ -48,7 +41,6 @@ def _retrieve_context(settings: Settings, query: str, top_k: int = 5) -> str:
     vector = _create_embedding(settings, query)
     vector_query = VectorizedQuery(
         vector=vector,
-        k_nearest_neighbors=10,
         fields="embedding",
     )
     results = search_client.search(
@@ -90,22 +82,22 @@ def _extract_assistant_text(response_json: dict[str, Any]) -> str:
         return "\n".join(parts).strip()
     return str(content).strip()
 
-
 def chat_in_terminal(settings: Settings) -> None:
-    if not settings.azure_openai_api_key:
-        raise ValueError("AZURE_OPENAI_API_KEY is required for direct chat mode")
 
     print("Starting direct key-based chat. Type 'exit' to stop or 'clear' to reset context.")
     system_prompt = (
         "You are a helpful assistant. Use only the retrieved context to answer. "
         "If context is insufficient, respond with 'I don't know'. "
         "Cite the source chunk numbers in square brackets like [1], [2]."
-    )
+    ) #TODO: make the prompt more specific to the use case
     history: list[dict[str, str]] = []
 
+    # Chat loop
     while True:
         user_text = input("You: ").strip()
         normalized = user_text.lower()
+
+        # Handle special commands
         if normalized in {"exit", "quit", "q"}:
             print("Bye.")
             return
@@ -115,7 +107,9 @@ def chat_in_terminal(settings: Settings) -> None:
             continue
         if not user_text:
             continue
-
+        
+        # Retrieve context from Azure AI Search
+        # TODO: consider retrieving context only for the questions that need it
         context_text = _retrieve_context(settings, user_text)
         augmented_user = (
             f"Question:\n{user_text}\n\n"
@@ -123,15 +117,12 @@ def chat_in_terminal(settings: Settings) -> None:
             "Answer using only retrieved context."
         )
 
+        # Construct messages with system prompt, recent history, and current user input
         messages: list[dict[str, str]] = [{"role": "system", "content": system_prompt}]
         messages.extend(history[-8:])
         messages.append({"role": "user", "content": augmented_user})
 
-        url = _openai_deployment_url(
-            settings.azure_openai_endpoint,
-            settings.azure_openai_chat_deployment,
-            "chat/completions",
-        )
+        url = f"{settings.azure_openai_endpoint[:-3]}/deployments/{settings.azure_openai_chat_deployment}/chat/completions?api-version=2024-10-21"
         response = requests.post(
             url,
             headers={
