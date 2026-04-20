@@ -1,80 +1,141 @@
-# Direct RAG Pipeline
+# Azure RAG Pipeline (Direct Azure OpenAI + Azure AI Search)
 
-This repository provides a direct Azure AI Search + Azure OpenAI RAG workflow.
-The pipeline is orchestrated from `main.py`, with ingestion logic in `src/ingester.py` and direct chat logic in `src/chat.py`.
+This repository implements an end-to-end Retrieval Augmented Generation (RAG) pipeline on Azure.
+It ingests local documents into Azure Blob Storage and Azure AI Search, enriches content with an Azure OpenAI embedding skill, and serves interactive terminal chat backed by retrieval.
 
-## Architecture Overview
+Core code paths:
 
-The current flow uses one ingestion entry point:
-
-1. `ingestion(settings)` in `src/ingester.py`
-2. `ensure_ingestion_resources(settings)` validates/creates required Azure resources
-3. `upload_local_files_to_knowledge_base(settings)` uploads local files and runs the indexer
-4. Returns the MCP endpoint for the knowledge base
-
-Resource definitions are loaded from JSON templates under `input_data/jsons/`:
-
-- `index.json`
-- `datasource.json`
-- `skillset.json`
-- `indexer.json`
-- `knowledge_source.json`
-
-Template placeholders (for example `__INDEX_NAME__`) are replaced at runtime using values from environment settings.
-
-## What main.py Does
-
-main.py:
-
-1. Loads environment configuration into `Settings`
-2. Runs ingestion by default
-3. Starts direct key-based chat in terminal (Azure OpenAI + Azure Search)
-
-Runtime flag behavior:
-
-- `RUN_INGESTION=true` (default): executes full ingestion first
-- `RUN_INGESTION=false`: skips ingestion and assumes resources already exist
+- `main.py`: startup, environment loading, strict settings construction, orchestration.
+- `src/ingester.py`: ingestion pipeline and Azure resource provisioning/synchronization.
+- `src/chat.py`: direct key-based retrieval + generation chat loop.
+- `input_data/jsons/*.json`: Search resource templates (index, datasource, skillset, indexer, knowledge source).
 
 ## Requirements
 
-Dependencies are pinned in `requirements.txt`:
+Python 3.10+ is recommended.
 
-- `azure-search-documents==11.7.0b2`
-- `azure-storage-blob`
-- `python-dotenv`
-- `requests`
-
-Install with:
+Install dependencies:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-## Required Environment Variables
+## All Environment Variables Are Required
 
-Minimum required values:
+Yes. In the current implementation, all runtime environment variables below are required for successful startup and execution.
+
+### Search configuration
 
 - `AZURE_SEARCH_ENDPOINT`
 - `AZURE_SEARCH_ADMIN_KEY`
-- `AZURE_OPENAI_ENDPOINT`
-- `AZURE_OPENAI_EMBEDDING_DEPLOYMENT`
-- `AZURE_OPENAI_CHAT_DEPLOYMENT`
-- `AZURE_OPENAI_API_KEY`
-- `AZURE_STORAGE_CONNECTION_STRING` or both `AZURE_STORAGE_ACCOUNT_NAME` and `AZURE_STORAGE_ACCOUNT_KEY`
-
-Common optional overrides (defaults are defined in `main.py`):
-
 - `AZURE_SEARCH_INDEX_NAME`
 - `AZURE_SEARCH_DATASOURCE_NAME`
 - `AZURE_SEARCH_SKILLSET_NAME`
 - `AZURE_SEARCH_INDEXER_NAME`
 - `AZURE_SEARCH_KNOWLEDGE_SOURCE_NAME`
 - `AZURE_SEARCH_KNOWLEDGE_BASE_NAME`
+
+### Azure OpenAI configuration
+
+- `AZURE_OPENAI_ENDPOINT`
+- `AZURE_OPENAI_EMBEDDING_DEPLOYMENT`
 - `AZURE_OPENAI_EMBEDDING_MODEL`
+- `AZURE_OPENAI_CHAT_DEPLOYMENT`
+- `AZURE_OPENAI_API_KEY`
+
+### Storage configuration
+
+- `AZURE_STORAGE_ACCOUNT_NAME`
+- `AZURE_STORAGE_ACCOUNT_KEY`
 - `AZURE_STORAGE_CONTAINER_NAME`
-- `AZURE_STORAGE_PROTOCOL` (default: `https`)
-- `AZURE_STORAGE_ENDPOINT_SUFFIX` (default: `core.windows.net`)
+
+### Local input and execution flags
+
 - `LOCAL_STORAGE`
+- `RUN_INGESTION`
+
+Notes:
+
+- `RUN_INGESTION` controls whether ingestion runs before chat. Use values like `true` or `false`.
+- `AZURE_OPENAI_ENDPOINT` should be provided in the same format expected by current code in `src/chat.py`.
+
+## Azure Pipeline Explained
+
+This project has two connected flows: ingestion and chat.
+
+### 1) Ingestion flow (data preparation)
+
+Entry point: `run_ingestion_pipeline(settings)` in `src/ingester.py`.
+
+Step-by-step:
+
+1. Ensure base storage is available.
+	- Checks whether the Azure Blob container exists.
+	- Creates it if missing.
+
+2. Ensure Search resources are synchronized with local templates.
+	- Index (`input_data/jsons/index.json`)
+	- Data source (`input_data/jsons/datasource.json`)
+	- Skillset (`input_data/jsons/skillset.json`)
+	- Indexer (`input_data/jsons/indexer.json`)
+	- Knowledge source (`input_data/jsons/knowledge_source.json`)
+
+3. Token replacement is applied to templates.
+	- Placeholders such as `__INDEX_NAME__` and `__AZURE_OPENAI_EMBEDDING_DEPLOYMENT__` are replaced from `Settings`.
+
+4. Search index lifecycle is handled safely.
+	- If the index schema changed incompatibly and the index is empty, it can be recreated.
+	- If knowledge artifacts block deletion, the pipeline removes blocking knowledge resources and retries.
+
+5. Skillset embedding behavior is model-aware.
+	- For `text-embedding-ada-002`, model/dimension hints are removed from skill payload to avoid service-side incompatibilities.
+
+6. Upload local files to Blob Storage.
+	- Reads all files recursively from `LOCAL_STORAGE`.
+	- Uploads blobs into `AZURE_STORAGE_CONTAINER_NAME`.
+
+7. Run indexer and wait for completion.
+	- Starts the indexer and polls status.
+	- Handles already-running indexer scenarios and waits until terminal state.
+
+8. Provision knowledge source and knowledge base.
+	- Uses Azure Search SDK for knowledge artifacts.
+	- Returns an MCP endpoint string for the created knowledge base.
+
+### 2) Chat flow (runtime Q&A)
+
+Entry point: `chat_in_terminal(settings)` in `src/chat.py`.
+
+Step-by-step:
+
+1. Receive user question in terminal.
+2. Create query embedding using Azure OpenAI embeddings deployment.
+3. Execute hybrid retrieval in Azure AI Search using:
+	- `search_text` (keyword/semantic-text side)
+	- `VectorizedQuery` on the `embedding` field (vector side)
+4. Build augmented prompt with retrieved chunks.
+5. Call Azure OpenAI chat completion deployment.
+6. Print answer and keep short conversation history.
+
+Commands in terminal chat:
+
+- `exit`, `quit`, `q`: stop chat.
+- `clear`: clear in-memory chat history.
+
+## How Azure Services Connect
+
+The integration graph is:
+
+1. Local files -> Azure Blob Storage.
+2. Azure AI Search data source points to Blob Storage.
+3. Azure AI Search indexer reads blobs via the data source.
+4. Skillset runs chunking + Azure OpenAI embedding skill during indexing.
+5. Enriched chunks are written into the Azure AI Search index.
+6. Chat runtime creates a new query embedding with Azure OpenAI.
+7. Azure AI Search returns relevant chunks.
+8. Azure OpenAI chat deployment generates final grounded answer.
+
+This creates a closed Azure-native RAG loop: index-time enrichment + query-time retrieval + grounded generation.
 
 ## Run
 
@@ -82,18 +143,14 @@ Common optional overrides (defaults are defined in `main.py`):
 python main.py
 ```
 
-Ingestion runs by default. To skip it:
+Runtime behavior:
 
-```bash
-set RUN_INGESTION=false
-python main.py
-```
+- If `RUN_INGESTION=true`, it executes ingestion first, then starts chat.
+- If `RUN_INGESTION=false`, it skips ingestion and starts chat directly.
 
-## Notes
+## Operational Notes
 
-- Index, datasource, skillset, and indexer are managed with Search REST calls.
-- Knowledge source and knowledge base are managed through `SearchIndexClient` SDK methods.
-- Uploaded files are read from `LOCAL_STORAGE` (default: `data/blob_container`).
-- Terminal chat is direct key-based (no Azure CLI required).
-- `AZURE_OPENAI_EMBEDDING_DEPLOYMENT` and `AZURE_OPENAI_EMBEDDING_MODEL` must refer to the same model family.
-- Embedding dimensions are currently hardcoded to `1536` in the pipeline settings.
+- Resource synchronization is performed on each ingestion run to keep Azure resources aligned with local templates.
+- Resource provisioning/update for index, datasource, skillset, and indexer is done with Search REST APIs.
+- Knowledge source/base operations are done via `SearchIndexClient` SDK methods.
+- The code is direct key-based for Azure OpenAI and does not depend on Azure CLI authentication.

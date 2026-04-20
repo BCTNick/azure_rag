@@ -21,7 +21,6 @@ env/
 
 # Environment and secrets
 .env
-.env.*
 *.env
 local.settings.json
 
