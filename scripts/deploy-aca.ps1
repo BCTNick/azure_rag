@@ -48,6 +48,20 @@ function Get-RequiredEnvValue {
   return $Map[$Key]
 }
 
+function Get-OptionalEnvValue {
+  param(
+    [hashtable]$Map,
+    [string]$Key,
+    [string]$Default = ""
+  )
+
+  if ($Map.ContainsKey($Key) -and -not [string]::IsNullOrWhiteSpace($Map[$Key])) {
+    return $Map[$Key]
+  }
+
+  return $Default
+}
+
 function Invoke-Arm {
   param(
     [string]$Method,
@@ -78,29 +92,30 @@ $AcrName = Get-RequiredEnvValue $envMap "AZURE_ACR_NAME"
 $WorkspaceName = Get-RequiredEnvValue $envMap "ACA_LOG_ANALYTICS_WORKSPACE"
 $ContainerAppsEnv = Get-RequiredEnvValue $envMap "ACA_ENV_NAME"
 $ContainerAppName = Get-RequiredEnvValue $envMap "ACA_APP_NAME"
-$ImageTag = if ($envMap.ContainsKey("AZURE_IMAGE_TAG") -and $envMap["AZURE_IMAGE_TAG"]) { $envMap["AZURE_IMAGE_TAG"] } else { "v1" }
+$ImageTag = Get-OptionalEnvValue $envMap "AZURE_IMAGE_TAG" "v1"
 
-$LocalStorage = if ($envMap.ContainsKey("LOCAL_STORAGE") -and $envMap["LOCAL_STORAGE"]) { $envMap["LOCAL_STORAGE"] } else { "/app/input_data/local_storage" }
+$LocalStorage = Get-OptionalEnvValue $envMap "LOCAL_STORAGE" "/app/input_data/local_storage"
 
-$AzureStorageAccountName = Get-RequiredEnvValue $envMap "AZURE_STORAGE_ACCOUNT_NAME"
-$AzureContainerName = Get-RequiredEnvValue $envMap "AZURE_CONTAINER_NAME"
-$AzureContainerSasToken = Get-RequiredEnvValue $envMap "AZURE_CONTAINER_SAS_TOKEN"
-$AzureContainerSasUrl = Get-RequiredEnvValue $envMap "AZURE_CONTAINER_SAS_URL"
+$AzureStorageAccountName = Get-OptionalEnvValue $envMap "AZURE_STORAGE_ACCOUNT_NAME"
+$AzureContainerName = Get-OptionalEnvValue $envMap "AZURE_CONTAINER_NAME"
+$AzureContainerSasToken = Get-OptionalEnvValue $envMap "AZURE_CONTAINER_SAS_TOKEN"
+$AzureContainerSasUrl = Get-OptionalEnvValue $envMap "AZURE_CONTAINER_SAS_URL"
 
-$AzureSearchEndpoint = Get-RequiredEnvValue $envMap "AZURE_SEARCH_ENDPOINT"
-$AzureSearchAdminKey = Get-RequiredEnvValue $envMap "AZURE_SEARCH_ADMIN_KEY"
-$AzureSearchIndexName = Get-RequiredEnvValue $envMap "AZURE_SEARCH_INDEX_NAME"
-$AzureSearchDatasourceName = Get-RequiredEnvValue $envMap "AZURE_SEARCH_DATASOURCE_NAME"
-$AzureSearchSkillsetName = Get-RequiredEnvValue $envMap "AZURE_SEARCH_SKILLSET_NAME"
-$AzureSearchIndexerName = Get-RequiredEnvValue $envMap "AZURE_SEARCH_INDEXER_NAME"
-$AzureSearchKnowledgeSourceName = Get-RequiredEnvValue $envMap "AZURE_SEARCH_KNOWLEDGE_SOURCE_NAME"
-$AzureSearchKnowledgeBaseName = Get-RequiredEnvValue $envMap "AZURE_SEARCH_KNOWLEDGE_BASE_NAME"
+$AzureSearchEndpoint = Get-OptionalEnvValue $envMap "AZURE_SEARCH_ENDPOINT"
+$AzureSearchAdminKey = Get-OptionalEnvValue $envMap "AZURE_SEARCH_ADMIN_KEY"
+$AzureSearchIndexName = Get-OptionalEnvValue $envMap "AZURE_SEARCH_INDEX_NAME"
+$AzureSearchDatasourceName = Get-OptionalEnvValue $envMap "AZURE_SEARCH_DATASOURCE_NAME"
+$AzureSearchSkillsetName = Get-OptionalEnvValue $envMap "AZURE_SEARCH_SKILLSET_NAME"
+$AzureSearchIndexerName = Get-OptionalEnvValue $envMap "AZURE_SEARCH_INDEXER_NAME"
+$AzureSearchKnowledgeSourceName = Get-OptionalEnvValue $envMap "AZURE_SEARCH_KNOWLEDGE_SOURCE_NAME"
+$AzureSearchKnowledgeBaseName = Get-OptionalEnvValue $envMap "AZURE_SEARCH_KNOWLEDGE_BASE_NAME"
 
-$AzureOpenAiEndpoint = Get-RequiredEnvValue $envMap "AZURE_OPENAI_ENDPOINT"
-$AzureOpenAiEmbeddingDeployment = Get-RequiredEnvValue $envMap "AZURE_OPENAI_EMBEDDING_DEPLOYMENT"
-$AzureOpenAiEmbeddingModel = Get-RequiredEnvValue $envMap "AZURE_OPENAI_EMBEDDING_MODEL"
-$AzureOpenAiChatDeployment = Get-RequiredEnvValue $envMap "AZURE_OPENAI_CHAT_DEPLOYMENT"
-$AzureOpenAiApiKey = Get-RequiredEnvValue $envMap "AZURE_OPENAI_API_KEY"
+$AzureOpenAiEndpoint = Get-OptionalEnvValue $envMap "AZURE_OPENAI_ENDPOINT"
+$AzureOpenAiEmbeddingDeployment = Get-OptionalEnvValue $envMap "AZURE_OPENAI_EMBEDDING_DEPLOYMENT"
+$AzureOpenAiEmbeddingModel = Get-OptionalEnvValue $envMap "AZURE_OPENAI_EMBEDDING_MODEL"
+$AzureOpenAiEmbeddingDimensions = Get-OptionalEnvValue $envMap "AZURE_OPENAI_EMBEDDING_DIMENSIONS" "1536"
+$AzureOpenAiChatDeployment = Get-OptionalEnvValue $envMap "AZURE_OPENAI_CHAT_DEPLOYMENT"
+$AzureOpenAiApiKey = Get-OptionalEnvValue $envMap "AZURE_OPENAI_API_KEY"
 
 $tokenResp = Invoke-RestMethod -Method Post -Uri "https://login.microsoftonline.com/$TenantId/oauth2/v2.0/token" -Body @{
   client_id = $ClientId
@@ -223,6 +238,7 @@ $appBody = @{
             @{ name = "AZURE_OPENAI_ENDPOINT"; value = "$AzureOpenAiEndpoint" }
             @{ name = "AZURE_OPENAI_EMBEDDING_DEPLOYMENT"; value = "$AzureOpenAiEmbeddingDeployment" }
             @{ name = "AZURE_OPENAI_EMBEDDING_MODEL"; value = "$AzureOpenAiEmbeddingModel" }
+            @{ name = "AZURE_OPENAI_EMBEDDING_DIMENSIONS"; value = "$AzureOpenAiEmbeddingDimensions" }
             @{ name = "AZURE_OPENAI_CHAT_DEPLOYMENT"; value = "$AzureOpenAiChatDeployment" }
             @{ name = "AZURE_OPENAI_API_KEY"; value = "$AzureOpenAiApiKey" }
           )

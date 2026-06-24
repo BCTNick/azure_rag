@@ -228,9 +228,6 @@ class LocalIngester:
 
     def _create_embedding(self, text: str) -> list[float]:
         s = self.settings
-        if not s.azure_openai_api_key:
-            raise ValueError("AZURE_OPENAI_API_KEY is required for local ingestion embeddings.")
-
         endpoint = s.azure_openai_endpoint
         if endpoint.endswith("/"):
             endpoint = endpoint[:-1]
@@ -252,8 +249,6 @@ class LocalIngester:
         s = self.settings
         if not text.strip():
             return ""
-        if not s.azure_openai_api_key:
-            raise ValueError("AZURE_OPENAI_API_KEY is required for doc summary generation.")
 
         endpoint = s.azure_openai_endpoint
         if endpoint.endswith("/"):

@@ -52,18 +52,6 @@ class ChatQueryEngine:
         r"\b(?:rts|its|guideline|guidelines|delegated\s+regulation)\b",
     ]
 
-    SOURCE_AUTHORITY_WEIGHTS = {
-        "regulation": 1.00,
-        "directive": 0.95,
-        "delegated_regulation": 0.90,
-        "rts": 0.88,
-        "its": 0.86,
-        "guideline": 0.72,
-        "recommendation": 0.68,
-        "opinion": 0.65,
-        "q&a": 0.60,
-    }
-
     def __init__(
         self,
         settings: Settings,
@@ -154,9 +142,6 @@ class ChatQueryEngine:
         return response.json()
 
     def _create_embedding(self, text: str) -> list[float]:
-        if not self.settings.azure_openai_api_key:
-            raise ValueError("AZURE_OPENAI_API_KEY is required for direct chat mode.")
-
         url = (
             f"{self.settings.azure_openai_endpoint[:-3]}/deployments/"
             f"{self.settings.azure_openai_embedding_deployment}/embeddings?api-version=2024-10-21"
@@ -453,28 +438,6 @@ class ChatQueryEngine:
 
         return fused
 
-    def _normalize_source_type(self, source_type: str) -> str:
-        normalized = source_type.lower().strip().replace(" ", "_")
-        if "delegated" in normalized and "regulation" in normalized:
-            return "delegated_regulation"
-        if "regulation" in normalized:
-            return "regulation"
-        if "directive" in normalized:
-            return "directive"
-        if "guideline" in normalized:
-            return "guideline"
-        if "recommend" in normalized:
-            return "recommendation"
-        if "opinion" in normalized:
-            return "opinion"
-        if "rts" in normalized:
-            return "rts"
-        if "its" in normalized:
-            return "its"
-        if "q&a" in normalized or "qa" in normalized:
-            return "q&a"
-        return normalized
-
     def _lexical_overlap(self, query: str, corpus: str) -> float:
         query_tokens = self._tokenize(query)
         corpus_tokens = self._tokenize(corpus)
@@ -502,11 +465,9 @@ class ChatQueryEngine:
 
     def _rerank_chunks(self, query: str, chunks: list[RetrievedChunk], profile: QueryProfile) -> list[RetrievedChunk]:
         for chunk in chunks:
-            authority_key = self._normalize_source_type(chunk.source_type)
-            authority_weight = self.SOURCE_AUTHORITY_WEIGHTS.get(authority_key, 0.55)
             overlap = self._lexical_overlap(query, chunk.corpus)
             ref_bonus = self._reference_match_bonus(chunk, profile.references)
-            chunk.fused_score = (0.62 * chunk.fused_score) + (0.24 * overlap) + (0.14 * authority_weight) + ref_bonus
+            chunk.fused_score = (0.72 * chunk.fused_score) + (0.28 * overlap) + ref_bonus
 
         return sorted(chunks, key=lambda c: c.fused_score, reverse=True)
 

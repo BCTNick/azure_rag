@@ -17,7 +17,7 @@ The system is designed for legal corpora such as regulations, directives, delega
 Implemented:
 
 - Local direct-push ingestion through src/local_ingester.py.
-- Azure-native ingestion path through src/ingester.py and JSON templates in input_data/jsons.
+- Legacy Azure-native ingestion experiment retained in src/ingester.py and JSON templates in input_data/jsons for possible future work.
 - Source-aware parsing for PDF, Excel, HTML, and text-like files.
 - Legal structure extraction (article, chapter, annex, page/row metadata).
 - Chunk enrichment with document summary and metadata.
@@ -34,7 +34,7 @@ Implemented:
 - Multi-variant retrieval orchestration.
 - Hybrid lexical + vector retrieval in Azure AI Search.
 - Weighted fusion of retrieval signals.
-- Authority-aware heuristic reranking for legal sources.
+- Query-aware heuristic reranking based on fused retrieval score, lexical overlap, and explicit reference matches.
 - MMR-style evidence diversification.
 - Citation extraction from selected evidence.
 
