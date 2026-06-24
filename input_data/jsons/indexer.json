@@ -3,6 +3,53 @@
 	"dataSourceName": "__DATASOURCE_NAME__",
 	"targetIndexName": "__INDEX_NAME__",
 	"skillsetName": "__SKILLSET_NAME__",
+	"fieldMappings": [
+		{
+			"sourceFieldName": "metadata_storage_path",
+			"targetFieldName": "id",
+			"mappingFunction": {
+				"name": "base64Encode"
+			}
+		},
+		{
+			"sourceFieldName": "metadata_storage_name",
+			"targetFieldName": "doc_name"
+		},
+		{
+			"sourceFieldName": "metadata_storage_path",
+			"targetFieldName": "source_type"
+		}
+	],
+	"outputFieldMappings": [
+		{
+			"sourceFieldName": "/document/corpus",
+			"targetFieldName": "corpus"
+		},
+		{
+			"sourceFieldName": "/document/doc_summary",
+			"targetFieldName": "doc_summary"
+		},
+		{
+			"sourceFieldName": "/document/page_row_num",
+			"targetFieldName": "page_row_num"
+		},
+		{
+			"sourceFieldName": "/document/chapter_num",
+			"targetFieldName": "chapter_num"
+		},
+		{
+			"sourceFieldName": "/document/article_num",
+			"targetFieldName": "article_num"
+		},
+		{
+			"sourceFieldName": "/document/annex_num",
+			"targetFieldName": "annex_num"
+		},
+		{
+			"sourceFieldName": "/document/embedding",
+			"targetFieldName": "embedding"
+		}
+	],
 	"parameters": {
 		"batchSize": 1,
 		"configuration": {

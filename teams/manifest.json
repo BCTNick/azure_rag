@@ -1,0 +1,39 @@
+{
+  "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.16/MicrosoftTeams.schema.json",
+  "manifestVersion": "1.16",
+  "version": "1.0.0",
+  "id": "1efd4742-2172-48eb-8d5a-b06b322395cf",
+  "packageName": "com.eiopa.ragbot",
+  "developer": {
+    "name": "EIOPA RAG Prototype",
+    "websiteUrl": "https://eiopa-rag-api.jollyriver-b8f37c92.germanywestcentral.azurecontainerapps.io",
+    "privacyUrl": "https://eiopa-rag-api.jollyriver-b8f37c92.germanywestcentral.azurecontainerapps.io/healthz",
+    "termsOfUseUrl": "https://eiopa-rag-api.jollyriver-b8f37c92.germanywestcentral.azurecontainerapps.io/healthz"
+  },
+  "name": {
+    "short": "EIOPA RAG",
+    "full": "EIOPA Legal RAG Assistant"
+  },
+  "description": {
+    "short": "Legal RAG assistant for regulatory Q&A.",
+    "full": "Prototype Microsoft Teams bot for legal and regulatory question answering over the indexed RAG corpus, with retrieved-source citations."
+  },
+  "icons": {
+    "outline": "outline.png",
+    "color": "color.png"
+  },
+  "accentColor": "#0F6CBD",
+  "bots": [
+    {
+      "botId": "1efd4742-2172-48eb-8d5a-b06b322395cf",
+      "scopes": [
+        "personal"
+      ],
+      "supportsFiles": false,
+      "isNotificationOnly": false
+    }
+  ],
+  "validDomains": [
+    "eiopa-rag-api.jollyriver-b8f37c92.germanywestcentral.azurecontainerapps.io"
+  ]
+}

@@ -1,0 +1,1095 @@
+Question ID
+2025_7613
+Legal act
+Regulation (EU) No 2022/2554 (DORA Reg)
+Topic
+ICT-related incidents (management / classification / reporting)
+Article
+3
+Subparagraph
+No. 8
+COM Delegated or Implementing Acts/RTS/ITS/GLs/Recommendations
+Regulation (EU) 2024/1772 - RTS on the classification of ICT-related incidents and cyber threats
+Article/Paragraph
+Articles 6, 8, 9
+Name of institution / submitter
+BaFin
+Country of incorporation / residence
+Germany
+Type of submitter
+Competent authority
+Subject matter
+Classification of phishing-attacks as a reportable major ICT-related incident
+Question
+Can individual phishing incidents that target the customers of a financial entity in their “private sphere” be subsumed under “compromises the security of the network and information systems” pursuant to Article 3 No. 8 of Regulation (EU) 2022/2554 and can they therefore constitute a major ICT-related incident that must be reported pursuant to Article 19 (1) of Regulation (EU) 2022/2554? 
+
+Background on the question
+The question concerns the categorization of a phishing incident as an ICT-related incident in situations where the phishing incident is directed against the customers of financial entities in their “private sphere” – e.g. the customer clicks on a phishing link in his private email inbox or the customer fills in his credentials on a “phishing-homepage” of the financial entity. 
+
+In order for individual phishing incidents targeting the privacy of a financial entity's customer to be considered as ICT-related incidents, they would first of all have to fulfil the definition of a major ICT-related incident (Article 3 No 8 and 10 of Regulation (EU) 2022/2554). Therefore, these incidents would have to be classified as “compromis[ing] the security of the network and information systems” (cf. Article 3 No. 8 of Regulation (EU) 2022/2554). However, the wording of Art. 3 No. 8 of Regulation (EU) 2022/2554 leaves open whether this impairment must be directed against the financial entities itself or whether customers of the financial entity, may also be affected. 
+
+The further criteria for assessing a major ICT-related incident from Delegated Regulation (EU) 2024/1772 do not currently provide clarity, as the relationship between Article 6 of Delegated Regulation (EU) 2024/1772 and the definition in Article 3 of Regulation 2022/2554 is unclear.
+
+Among the national supervisory authorities, the consideration of these phishing incidents is handled differently. The question submitted is therefore intended to ensure legal certainty in the interpretation of the aforementioned standard as well as the uniformity and comparability of reports of major ICT-related incidents.
+
+Moreover, we would like to point out, that a reporting obligation in these cases would entail a considerable amount of additional work for financial entities due to the large number of phishing incidents. Mostly all of them would be reportable because the materiality thresholds of Article 8 (1) lit. a Delegated Regulation (EU) 2024/1772 and Article 9 (5) lit. b of Delegated Regulation (EU) 2024/1772 will be regularly met in this context (possible loss of data in case of a successful, malicious and unauthorised access, e.g.  the customer clicks on a phishing link in his private email inbox and therefore the threat actor receives access to the customer account). It is questionable whether this is in line with the idea of reducing administrative burdens, as stated, for example, in recital 23 of Regulation (EU) 2022/2554.
+
+Submission date
+04/11/2025
+Final publishing date
+06/02/2026
+Final answer
+When a phishing incident in the private sphere of the customer does not affect services provided by the financial entity directly (or via any of the financial entity’s third-party providers), it does not qualify as an ‘ICT-related incident’ or ‘an operational or security payment-related incident’ under DORA. Therefore, in that case, it cannot trigger the thresholds to be a major ICT-related incident and the related reporting obligation.
+
+By contrast, if the financial entity itself is successfully targeted and faces an intrusion, for example through phishing emails sent to employees, or in case a widescale phishing campaign ending up affecting the financial entity’s services, the incident can be qualified as an ICT-related incident under DORA. To the extent that this ICT-related incident reaches the relevant thresholds, it may be classified as a major ICT-related incident.
+
+Status
+Final Q&A
+Answer prepared by
+Answer prepared by the Joint ESAs Q&A
+
+Question ID
+2025_7539
+Legal act
+Regulation (EU) No 2022/2554 (DORA Reg)
+Topic
+ICT-related incidents (management / classification / reporting)
+Article
+3
+Paragraph
+21
+COM Delegated or Implementing Acts/RTS/ITS/GLs/Recommendations
+Not applicable
+Article/Paragraph
+N/A
+Type of submitter
+Law firm
+Subject matter
+Types of "telephone services" included under the definition of "ICT services"
+Question
+Which types of telephone services fall within the scope of the definition of "ICT services"? 
+
+Background on the question
+Article 3(21) defines ICT services as "digital and data services provided through ICT systems to one or more internal or external users on an ongoing basis, including hardware as a service and hardware services which includes the provision of technical support via software or firmware updates by the hardware provider, excluding traditional analogue telephone services". Recital 35 further states that this exclusion covers "only the limited category of traditional analogue telephone services qualifying as Public Switched Telephone Network (PSTN) services, landline services, Plain Old Telephone Service (POTS), or fixed-line telephone services".
+
+However, there is uncertainty as to whether more modern telecommunications infrastructure - such as fiber-optic lines or black fiber - should be considered part of the excluded category or fall within the scope of ICT services. For example, while fiber-optic services are not analogue in nature, it is unclear whether their classification as “landline” services results in their exclusion.
+
+Clarification on the general criteria or characteristics that distinguish included from excluded telephone services would be helpful for consistent interpretation and application of the DORA Regulation.
+
+Submission date
+30/07/2025
+Final publishing date
+06/02/2026
+Final answer
+The exclusion provided under Article 3(21) of DORA, which refers to “traditional analogue telephone services”, cannot be extended to fibre optic networks, including dark fibre.
+
+DORA deliberately defines ICT services broadly so as to encompass any digital (i.e. electronic rather than purely electrical) service that directly contributes to the functioning of financial entities’ information and communication systems. This includes connectivity and data transmission services, such as telecommunications networks, and therefore fibre optic infrastructure.
+
+Recital 35 clarifies that the exclusion is limited to traditional analogue telephone services. This expression refers to telephony based on analogue circuit switching, such as classic fixed-line voice services delivered via the public switched telephone network (PSTN) for Plain Old Telephone Service (POTS) as referred to in that recital. These services deliver speech as continuous analogue electrical signals (without the involvement inverse multiplexers to separate voice from data signals at the delivery location).
+
+Recital 35, which also mentions landline services, must be interpreted consistently with this notion: it concerns fixed lines solely when they are delivering the traditional analogue voice service, not the physical infrastructure as such. The rationale for the exclusion does not lie in the use of a physical cable (copper, fibre, etc.), but rather in the transmission technology employed. The analogue PSTN works through continuous electrical modulation. Fibre networks, by contrast, are designed to carry digital optical signals, which rely on packet-switched transmission and require electronic systems to be activated, routed, and secured. They are used for digital telephone services, such as Voice over IP (VoIP) and cloud-based communications platforms. The mere fact that fibre is “dark” does not alter its inherent function as a medium for digital traffic: it remains a passive transmission capacity which, once lit, plays a direct role in carrying digital signals and must therefore be treated as part of an ICT service.
+
+It has to be reminded that DORA’s objective is to preserve the resilience and operational continuity of ICT systems and services supporting the financial sector. From this perspective, the distinction between “lit” and “unlit” fibre is immaterial: what matters is that fibre constitutes critical infrastructure which must be deployed, monitored, and protected (redundancy, contingency, recovery in case of cuts) to ensure the resilience of financial entities’ digital operations. Unlike legacy analogue voice services, which are being phased out and no longer pose material resilience concerns, fibre-based services are central to today’s digital communications and therefore fall fully within the scope of ICT services.
+
+Status
+Final Q&A
+Answer prepared by
+Answer prepared by the Joint ESAs Q&A
+
+Question ID
+2025_7466
+Legal act
+Regulation (EU) No 2022/2554 (DORA Reg)
+Topic
+Other DORA topics
+Article
+Recital 63
+COM Delegated or Implementing Acts/RTS/ITS/GLs/Recommendations
+Not applicable
+Article/Paragraph
+Not applicable
+Name of institution / submitter
+Dr. Rolf Kobabe
+Country of incorporation / residence
+Germany
+Type of submitter
+Law firm
+Subject matter
+Public Authorities Exemption
+Question
+Is the exemption for public authorities as quoted in recital 63 sentence 3 last half-sentence meant to be a general exemption for all public authorities as defined under art. 3 no. 65 DORA when providing ICT related services in the context of fulfilling State functions, or is the exemption limited to payment services and payment-related solutions?
+
+Background on the question
+Recital 63 sentence 1 DORA provides that DORA should cover, as a general rule, a wide range of ICT third-party service providers. Recital 63 sentence 2 DORA then provides and clarifies that undertakings which are part of a financial group and provide ICT services predominantly to their parent undertaking, or to subsidiaries or branches of their parent undertaking, as well as financial entities providing ICT services to other financial entities, should also be considered as ICT third-party service providers under DORA. Recital 63 sentence 3 DORA provides for a very specific part of the financial industry, namely for participants in the payment services ecosystem, providing payment-processing activities, or operating payment infrastructures, that such participant should also be considered to be ICT third-party service providers under DORA.
+
+In this same sentence of recital 63 sentence 3 DORA the last half-sentence provides two exemptions, (i) central banks when operating payment or securities settlement systems (which is understandable in this context in view of operating payment systems, but not quiet in view of securities settlement systems, since recital 63 sentence 3 DORA deals with payment systems and the payment services ecosystem, but not with securities settlement systems), and (ii) public authorities when providing ICT related services in the context of fulfilling State functions, whereas the latter is not qualified to payment systems, the payment ecosystem, securities settlement systems, or whatsoever.
+
+The original proposal of the European Commission of 24.9.2020 did not include any provisions that now have become law in recital 63. It seems that this amendment was included by the Council Mandate (as set out in the Three-column table to commence trilogues of Council of the European Union of 17 January 2022, 5297/22). The rationale behind this amendment cannot be determined based on the published documents relating to the legislative process.
+
+Therefore, it is not clear, whether the exemption for public authorities is meant as a general rule (for any ICT related service in the context of fulfilling State functions), or whether such ICT related service of a given public authority needs to be a qualified ICT related service (e.g. payment service).
+
+In this context it is in addition not clear, whether an 'ICT related service' (which is not defined in DORA) is wider (which seems to be the case) than an 'ICT service'.
+
+For example, would a public administration entity that provides software tools to financial institutions to administrate subsidies (e.g. refinanced by EU Institutions) not be considered as an ICT third-party service provider, since it provides obviously ICT related services (if not ICT services), but - as a public authority - such services are provided in the context of fulfilling a State function (meaning: governmental economic development of regions)? As a consequence, such public authority would not need to be included in the ICT third-party risk management by the financial institution.
+
+Submission date
+26/05/2025
+Final publishing date
+06/02/2026
+Final answer
+Recital (63) of the DORA Regulation states that “public authorities providing ICT related services in the context of fulfilling State functions” should not be considered ICT third-party service providers (ICT TPPs) under DORA. This recital should be interpreted broadly to exclude essentially all public authorities from the scope of ICT TPP designation under DORA.
+In light of this interpretation, a public authority that provides data to financial entities should not be in scope of DORA, as an ICT service provider.
+Furthermore, the contractual arrangement requirement under Article 30.2 applies only where a financial entity engages an ICT TPP. If the public authority is not considered an ICT TPP, then the contractual obligations outlined in Article 30.2, including those under points (b) and (d), do not apply.
+
+Status
+Final Q&A
+Answer prepared by
+Answer prepared by the Joint ESAs Q&A
+
+
+Question ID
+2024_7290
+Legal act
+Regulation (EU) No 2022/2554 (DORA Reg)
+Topic
+ICT third-party risk management
+Article
+3
+Paragraph
+21
+COM Delegated or Implementing Acts/RTS/ITS/GLs/Recommendations
+Not applicable
+Article/Paragraph
+N/A
+Type of submitter
+Credit institution
+Subject matter
+Definition and scope of ICT services
+Question
+What is the correct reading of Article 3 (21) and Recital 63, Article 2 and Article 58(2) of Regulation (EU) No. (EU) 2022/2554 (DORA Reg) in combination with  the COM/2023/0365 European Commission Report on the review of Directive 2015/2366/EU ?
+
+Background on the question
+In our understanding, in line with the European Commission report COM/2023/0365, payments systems and entities involved in payment processing activities should not be treated as entities falling within scope of DORA Regulation to whom DORA requirements would be applicable directly (as financial institutions listed in Article 2 (Scope) of DORA) and that consequentially would be subject to direct oversight by competent authorities. 
+
+However, it does not affect that such operators of payments systems and entities involved in payment processing activities should be treated as ICT service providers by financial institutions, as established by Recital 63, whereas operation of such payment processing systems/infrastructures/networks should be treated as ICT services by financial entities. Consequentially, mandatory DORA requirements should be applied to such arrangements impacting such payment system operators indirectly, as they in essence match the "ICT services'' definition provided by Article 3 (21) of DORA Regulation. Inter alia, it would include securing contractual framework that match the requirements of Articles 28 and 30.
+
+Various major payment systems/infrastructure providers are refusing to negotiate terms of agreements governing use of their payment systems/infrastructures, arguing that requirements set by DORA are not applicable to payment systems/infrastructures.
+
+Submission date
+20/12/2024
+Final publishing date
+14/11/2025
+Final answer
+Article 2(1) of the Digital Operational Resilience Act (DORA) introduces the entities within the scope of DORA. Providers of payment-processing activities or operating payments infrastructures, including payment card schemes, are not included in said Article and, therefore, are not to be considered financial entities within the scope of DORA.
+
+Article 3(21) of DORA defines ‘ICT services’ as digital and data services provided through ICT systems to one or more internal or external users on an ongoing basis, including hardware as a service and hardware services which includes the provision of technical support via software or firmware updates by the hardware provider, excluding traditional analogue telephone services.
+
+Recital (63) of DORA specifies that providers of payment-processing activities or operating payments infrastructures should be considered to be ICT third-party service providers under DORA, with the exception of central banks when operating payment or securities settlement systems, and public authorities when providing ICT related services in the context of fulfilling State functions.
+
+It follows from the above that any relevant service provided by providers of payment-processing activities or operating payments infrastructures that falls within the definition under Article 3(21) of DORA, should be considered as an ICT service under DORA. Therefore, financial entities should ensure they comply with relevant provisions of DORA relating to the services provided by these ICT third-party service providers.
+
+It should, however, be noted that not all services provided by these providers, including payment card schemes, are to be considered ICT services. Services provided by a governance body of a scheme or business processes of the providers of payment-processing activities or operating payments infrastructure without a prevailing ICT component, such as clearing and settlement, should not be considered within the scope of ICT services under Article 3(21) of DORA.
+
+Finally, it should be noted that in accordance with Article 31(8)(ii) of DORA, ICT third-party service providers that are subject to oversight frameworks established for the purposes of supporting the tasks referred to in Article 127(2) of the Treaty on the Functioning of the European Union, shall not fall within the scope of the oversight framework of critical ICT third-party service providers under DORA.
+
+Status
+Final Q&A
+Answer prepared by
+Answer prepared by the Joint ESAs Q&A
+
+
+Question ID
+2025_7439
+Legal act
+Regulation (EU) No 2022/2554 (DORA Reg)
+Topic
+ICT-related incidents (management / classification / reporting)
+Article
+18(4)
+Subparagraph
+Subparagraph (c)
+COM Delegated or Implementing Acts/RTS/ITS/GLs/Recommendations
+Regulation (EU) 2024/1772 - RTS on the classification of ICT-related incidents and cyber threats
+Article/Paragraph
+7
+Type of submitter
+Competent authority
+Subject matter
+Staff costs
+Question
+Do imputed staff costs count as part of staff costs in accordance with Article 18(1)(f) of Regulation (EU) 2022/2554 in conjunction with Article 7(1)(c) Delegated Regulation (EU) 2024/1772 and Article 4(e) Delegated Regulation (EU) 2025/301 and must, therefore, be reported as part of gross direct and indirect costs and losses of an incident?
+
+Background on the question
+In order to determine the economic impact of an ICT-related incident, in accordance with Article 18(1)(f) of Regulation (EU) 2022/2554 in conjunction with Article 7(1)(c) Delegated Regulation (EU) 2024/1772 „staff costs, including costs associated with replacement or relocation of staff, recruitment of extra staff, remuneration of overtime and recovery of lost or impaired skills” shall be taken into account. According to Article 4(e) Delegated Regulation (EU) 2025/301, these costs are to be reported as part of the final report in accordance with Article 19(4)(c) of Regulation (EU) 2022/2554.
+
+There is no further specification, particularly with regard to imputed staff costs that do not lead directly to a monetary outflow. Article 7(2) of Delegated Regulation (EU) 2024/1772 does not provide any information on this either, according to which only „costs that are necessary for the day-to-day operation of the business” are excluded from the above-mentioned regulation.
+
+The question submitted is intended to ensure legal certainty in the interpretation of the aforementioned Delegated Regulation as well as the consistency and comparability of reports of major ICT-related incidents.
+
+In particular, it is not clear whether the staff costs to be taken into account in accordance with Article 7(1) of the Delegated Regulation also include imputed staff costs. These can arise, for example, if employees are unable to perform their line tasks due to the priority processing of an ICT-related incident or postpone them to a later date, or if they build up overtime to process an ICT-related incident, which is then reduced by way of compensatory time off. Besides these rather indirect costs the term imputed staff costs also cover (direct) costs for personnel hired and responsible for processing of ICT-related incidents.
+
+Additionally, with regard to Article 7(2) of Delegated Regulation (EU) 2024/1772, we do not find clear whether staff costs for resources which have already been earmarked and planned for incident handling fall within the day-to-day operation of the business and are hence excluded. In particular, it is unclear what is the distinction between the costs “for keeping skills of staff up to date” and those for “the recovery of lost or impaired skills”. 
+
+Submission date
+12/05/2025
+Final publishing date
+14/11/2025
+Final answer
+Article 7 of Delegated Regulation (EU) 2024/1772 specifying the criteria for the classification of ICT-related incidents outlines the types of direct and indirect costs and losses that entities must take into account to determine the economic impact due to a ICT-related incident.
+
+Article 7(1) (c) of the Delegated Regulation (EU) 2024/1772 specifies that the economic impact of an ICT-incident includes staff costs. The provision also specifies that staff costs include costs “associated with replacement or relocation of staff, recruitment of extra staff, remuneration of overtime and recovery of lost or impaired skills”. Where the overtime is not remunerated but compensated through working time arrangements, the incident-related overtime should still count towards the staff costs, if those costs can clearly be attributed to the incident. Similarly, working time that is clearly allocated to the handling of the incident, should count towards staff costs. This consideration also applies where the resources have been earmarked or planned for incident handling in general. This ensures a consistent assessment of costs irrespective of internal processes and resource planning and allocation of financial entities.
+
+Staff training activities aimed to prevent or minimize the consequence of potential incidents fall under the exclusion of the costs in accordance with Article 7(2) of the Delegated Regulation (EU) 2024/1772 for keeping skills of staff up to date, as a cost necessary for the day-to-day operation of the business. Instead, costs for recovery of skills lost or impaired, are those which occur as a consequence of an incident in accordance with Article 7(1) of the Delegation Regulation (EU) 2024/1772, for example addressing retraining of staff that had to be reallocated.
+
+It is to be noted that the Delegation Regulation (EU) 2024/1772 does not prescribe a specific calculation methodology for these costs. This omission reflects the inherent complexity and the variability of cost structures across different financial entities and activities.
+
+Status
+Final Q&A
+Answer prepared by
+Answer prepared by the Joint ESAs Q&A
+
+
+Question ID
+2025_7309
+Legal act
+Regulation (EU) No 2022/2554 (DORA Reg)
+Topic
+Register of information (DORA)
+Article
+28
+Paragraph
+3
+COM Delegated or Implementing Acts/RTS/ITS/GLs/Recommendations
+Regulation (EU) 2024/2956 - ITS on the register of information
+Article/Paragraph
+Not applicable
+Type of submitter
+Consultancy firm
+Subject matter
+ANNUAL REPORT ON NEW ARRANGEMENTS ON THE USE OF ICT SERVICES
+Question
+Does Article 28(3) DORA require a separate and specific communication in addition to the Register of Information, or whether the communication of such data is already fulfilled through the annual submission of the same Register, constituting a single compliance obligation?
+
+In the event that a separate communication is required in addition to the annual submission of the Register of Information, what is the meaning of the term 'categories of third-party ICT service providers'?
+
+Background on the question
+Pursuant to the provisions of Chapter V, Section I, Article 28, Paragraph 3 of the DORA Regulation states:
+
+“Financial entities shall communicate at least once a year to the competent authorities the number of new agreements for the use of ICT services, the categories of third-party ICT service providers, the type of contractual arrangements, and the ICT functions and services provided”.
+
+Article 28(3) specifies the obligation to report annually the number of new agreements with ICT suppliers, their categories, the type of contracts and the ICT services provided.
+
+However, some questions of interpretation remain open, including:
+
+The nature of the reporting: it is unclear whether this obligation should be considered a separate fulfilment from the annual submission of the Information Register, which already includes details on ICT suppliers and contracts.
+
+For example, if a financial entity enters into 10 new ICT contracts with different suppliers in a year, these contracts will be included in the Information Register. It remains to be clarified whether separate reporting is also required and, if so, how to correctly categorise suppliers.
+
+The definition of ‘categories of third-party ICT service providers’: the Regulation does not specify whether this term refers to standardised classifications (e.g. cloud providers, data centres, cybersecurity) or to criteria defined independently by financial entities, and no further evidence was found on this.
+
+For example, in the case where a financial entity enters into a new contract with a cloud provider for the storage of critical data, the question arises as to which category should be used to classify this provider, whether generically ‘cloud provider’ or another category not explicitly defined.
+
+Submission date
+17/01/2025
+Final publishing date
+14/08/2025
+Final answer
+With the aim of ensuring consistency on extractions of data, the ESAs Decision (see ESA 2024 22), requires that competent authorities provide to the ESAs on a yearly basis the registers of information referred to in Article 28(3) of Regulation (EU) 2022/2554, in accordance with the reporting timelines set out in Article 4 and 5 of said decision. In general, this will fulfill the requirement, and no second specific communication is needed.
+
+In addition to said yearly submission, financial entities shall make available to the competent authority, upon its request, the register of information in accordance with Article 28(3), fourth subparagraph of Regulation (EU) 2022/2554.
+
+Finally, financial entities shall inform the competent authority in a timely manner regarding any planned ICT third party contractual arrangements supporting critical or important functions or if a function supported by ICT third parties becomes critical or important, as per Article 28(3), fifth subparagraph of Regulation (EU) 2022/2554.
+
+Categorization of third-party ICT service providers should be made according to the type of service they provide, using the typology of services laid out in Annex III of Regulation (EU) 2024/2956
+
+Status
+Final Q&A
+Answer prepared by
+Answer prepared by the Joint ESAs Q&A
+
+
+Question ID
+2024_7089
+Legal act
+Regulation (EU) No 2022/2554 (DORA Reg)
+Topic
+ICT third-party risk management
+Article
+28
+Paragraph
+3
+COM Delegated or Implementing Acts/RTS/ITS/GLs/Recommendations
+Not applicable
+Article/Paragraph
+ITS Recital 7
+Name of institution / submitter
+AFME
+Country of incorporation / residence
+Belgium
+Type of submitter
+Industry association
+Subject matter
+Identification of ICT Service Providers
+Question
+Can the ESAs confirm there is no expectation to capture within the Register of Information the ICT subcontractors of non-ICT service providers?
+
+Background on the question
+Recital 7 of the ITS suggests financial entities should consider whether non-ICT service providers are relying on ICT services. If so, it is understood that for the purposes of the Register of Information such providers may be treated as an ICT provider. This would see their ICT subcontractors listed in the Register, provided they effectively underpinned services supporting critical or important functions. 
+
+Submission date
+20/05/2024
+Final publishing date
+08/08/2025
+Final answer
+Where the direct third-party service provider of a financial entity does not provide an ICT service, the service falls outside of the scope of the DORA register of information. In case the said third-party service provider uses ICT services for the fulfilment of its contracted services through the use of ICT subcontractors, those remain outside the scope of the register of information (DORA Article 28.3). Therefore, such use of ICT services through ICT subcontractors does not need to be documented in the DORA register of information.
+
+Financial entities are still required to comply with any relevant requirements under other applicable financial legislation, for instance, the EBA Guidelines.
+
+It should be stressed that in case the financial entity considers, as part of its risk assessment, that the ICT service provided by the ICT subcontractor supports a critical or important function or material parts thereof to an extent that it could be requalified as equivalent to an ICT service provided directly to the financial entity, the DORA Chapter V requirements will apply.
+
+Status
+Final Q&A
+Answer prepared by
+Answer prepared by the Joint ESAs Q&A
+
+
+Question ID
+2025_7387
+Legal act
+Regulation (EU) No 2022/2554 (DORA Reg)
+Topic
+Register of information (DORA)
+Article
+28
+Paragraph
+3
+COM Delegated or Implementing Acts/RTS/ITS/GLs/Recommendations
+Regulation (EU) 2024/2956 - ITS on the register of information
+Article/Paragraph
+Not applicable
+Type of submitter
+Other
+Subject matter
+How to fill the refPeriod field of the parameters.csv file for the DORA register of information
+Question
+As part of the DORA register of information packaging process, we are required to include a parameters.csv file that contains a refPeriod field. Could you please confirm what specific date should be used for the refPeriod?
+
+Background on the question
+Below is an example of the contents of a parameters.csv file:
+
+name,value
+entityID,rs:ABCDEFGHIJKLMNOPQRST.CON
+refPeriod,2025-04-15
+baseCurrency,iso4217:EUR
+decimalsInteger,0
+decimalsMonetary,0  
+
+Could you please confirm whether the refPeriod field should reflect the reporting deadline for the DORA register of information — specifically, April 15, 2025, for this year?
+
+Submission date
+25/03/2025
+Final publishing date
+08/08/2025
+Final answer
+In accordance with the ESAs Decision concerning the reporting by the competent authorities of the information necessary for the designation of critical ICT-third party service providers (CTPPs) of 8 November (see ESA 2024 22) the reference date for the registers to be reported in 2025 is set to 31 March 2025, and then for 31 December of preceding year for the registers to be reported form 2026 onwards.
+
+Status
+Final Q&A
+Answer prepared by
+Answer prepared by the Joint ESAs Q&A
+
+
+Question ID
+2025_7388
+Legal act
+Regulation (EU) No 2022/2554 (DORA Reg)
+Topic
+Register of information (DORA)
+Article
+Article 28
+Paragraph
+1-3
+COM Delegated or Implementing Acts/RTS/ITS/GLs/Recommendations
+Not applicable
+Article/Paragraph
+N/A
+Type of submitter
+Competent authority
+Subject matter
+Obligation to maintain a register of information for FEs exempt under article 16
+Question
+ Are financial entities, which according to article 16(1) in DORA are excluded from application of Articles 5 to 15, also are excluded from application of article 28 of DORA?
+
+ 
+
+ 
+
+Background on the question
+We have found that we need a clarification on this as it is unclear to us whether an FE mentioned in article 16(1) o DORA should also be relieved of the obligation to maintain and update a register of information.
+
+Article 16(1) mentions only exemption from articles 5-15.
+
+However, the wording of article 28 could suggest that such entities are exempt from application of all of article 28, including the obligation to maintain an RoI. For example:
+
+Article 28(1): “Financial entities shall manage ICT third-party risk as an integral component of ICT risk within their ICT risk management framework as referred to in Article 6(1) (…)”. The structure of this sentence suggests that only entities manage ICT risk within the framework referred to in article 6(1) are obligated to apply article 28(1).
+
+Article 28(3) begins with the same structure as article 28(3), albeit only mentioning the ICT risk management framework without specific mention of article 6(1), so the conclusion would be the same as for article 28(1).
+
+Submission date
+26/03/2025
+Final publishing date
+08/08/2025
+Final answer
+DORA Recital 21 specifies that in order to maintain full control over ICT risk, financial entities need to have comprehensive capabilities to enable a strong and effective ICT risk management, as well as specific mechanisms and policies for handling all ICT-related incidents and for reporting major ICT-related incidents. It also states that the digital operational resilience baseline for financial entities should be increased while also allowing for a proportionate application of requirements for certain financial entities, particularly microenterprises, as well as financial entities subject to a simplified ICT risk management framework.
+
+In addition, DORA Recital 43 states that financial entities which qualify as microenterprises or are subject to the simplified ICT risk management framework under this Regulation should not be required to establish a role to monitor their arrangements concluded with ICT third-party service providers on the use of ICT services.
+
+However, DORA Article 28(3) establishes the obligation to maintain and update a register of information in relation to all contractual arrangements on the use of ICT services provided by ICT third-party service providers with no exception.
+
+All financial entities that are subject to DORA are required to maintain a register of information. Additionally, they must apply third-party risk management framework that is proportional to the risks associated with their activities. This means that the extent and complexity of the risk management measures should match the level of risk involved. For example, smaller financial entities, which typically use fewer ICT services, would have simpler risk management requirements compared to larger entities. The principle of proportionality is already embedded in the requirements of the register of information, ensuring that the measures are appropriate for the size and complexity of the entity's operations.
+
+Status
+Final Q&A
+Answer prepared by
+Answer prepared by the Joint ESAs Q&A
+
+
+Question ID
+2024_7098
+Legal act
+Regulation (EU) No 2022/2554 (DORA Reg)
+Topic
+ICT third-party risk management
+Article
+28
+Paragraph
+3
+COM Delegated or Implementing Acts/RTS/ITS/GLs/Recommendations
+Not applicable
+Article/Paragraph
+/
+Type of submitter
+Credit institution
+Subject matter
+Scope of Register of Information for Contractual Arrangements on the use of ICT Services Provided by ICT Third-party Service Providers
+Question
+According to Article 28(3) of DORA, must an EU parent bank, which has subsidiaries both within and outside the EU, maintain the register of information regarding all contractual arrangements for the use of ICT services only for subsidiaries that are subject to DORA (financial entities established in the EU), or does this requirement extend to subsidiaries established outside the EU for which DORA does not apply?
+
+Background on the question
+Article 28(3) of DORA requires financial entities, as part of their ICT risk management framework, to maintain and update a register of information regarding all contractual arrangements for the use of ICT services provided by ICT third-party service providers at the entity level, and at sub-consolidated and consolidated levels. The bank seeks clarification on whether the EU parent bank must maintain this register only for subsidiaries based in the EU that are subject to DORA, or also for subsidiaries based outside the EU for which DORA does not apply. 
+
+If the parent bank were required to maintain the register for subsidiaries based outside the EU, it would face several challenges. These include increased administrative burden and complexity in managing compliance across different regulatory regimes. In these non-EU countries, ICT service providers are not bound by DORA, which adds another layer of complexity. 
+
+Submission date
+29/05/2024
+Final publishing date
+25/07/2025
+Final answer
+Answer already provided as part of the frequently asked questions (FAQ) about the preparation and the reporting of the registers of information of contractual arrangements with the ICT third-party providers that financial entities need to maintain in accordance with Article 28(3) of Regulation (EU) 2022/2554 (DORA) and as specified in the Commission Implementing Regulation (EU) 2024/2956 (ITS on the registers of information).
+The scope of the registers of information held at the sub-consolidated and consolidated basis should reflect all financial entities and their branches that belong to their consolidation scope in accordance with both Directive 2013/34/EU and the relevant sectorial Union legislation.
+
+Status
+Final Q&A
+Answer prepared by
+Answer prepared by the Joint ESAs Q&A
+
+Question ID
+2024_7178
+Legal act
+Regulation (EU) No 2022/2554 (DORA Reg)
+Topic
+ICT third-party risk management
+Article
+13
+Paragraph
+1
+Subparagraph
+(c)
+COM Delegated or Implementing Acts/RTS/ITS/GLs/Recommendations
+Regulation (EU) 2024/1774 – RTS on ICT risk management framework and on simplified ICT risk management framework
+Article/Paragraph
+13/1/c
+Type of submitter
+Credit institution
+Subject matter
+Elaboration on the meaning of a separated and dedicated network for ICT asset administration
+Question
+In the "RTS on ICT Risk Management Framework and on simplified ICT Risk Management Framework"; How should we read: ''A separate and dedicated network for ICT asset administration, along with strict prohibition of direct internet access[...]''? (article 13, paragraph 1, sub (c)).
+A separate and dedicated network could be on-premises, but is a virtual-LAN sufficient? or is it enough to have it in the regular production-LAN with other systems? and what if the CMDB is in a cloud environment? is it then a de facto separated and dedicated network or not?
+
+Background on the question
+ICT asset administration happens in an Configuration Management Database (CMDB), these can be hosted on-premises or in the cloud but in either case it is important to know how to interpret (especially) the ''separate and dedicated network" as it is multi-interpretable by being a virtual-LAN but also a complete physically separated network. In the case of a cloud-hosted solution there could be an issue, as it is not clear if these types of solutions adhere to this requirement in the strictest interpretation. Depending on the level of interpretation, this could greatly effect the architecture of CMDB systems in institutions.
+
+Submission date
+19/08/2024
+Final publishing date
+25/07/2025
+Final answer
+DORA regulation and the corresponding technical standards are principle-based ( Delegated regulation - EU - 2024/1774 - EN - EUR-Lex) and technology agnostic and thus they do not identify specific configurations to ensure they can remain future-proof and that financial entities can decide on the specific arrangements based on their needs, their bespoke environment and their ICT risk assessment. 
+
+In this context, logical (e.g. using of virtual-LAN (vLAN) or a cloud-based solution), physical separation or a combination of both may or may not serve as adequate controls to meet the requirement of “(c)the use of a separate and dedicated network for the administration of ICT assets” (RTS on ICT risk management Article 13(c)). The decision on which controls to implement to ensure such separation would need to be taken in accordance with Article 13 point (a) and in compliance with Article 13 as a whole for network security management aspects.
+
+For example, in the case of isolating an administrative network, where ensuring sufficient separation is key, it is also important to stress that a virtual LAN (vLAN) alone may not be sufficient to ensure effective isolation of the administrative network. In this case, the financial entity should assess whether the logical segregation alone is sufficient and in the case of opting for a VLAN at least consider complementing vLAN with additional controls (e.g. a firewall with an appropriate filtering policy, or implementing appropriate routing, etc). Furthermore, it is important to note that any decision on the use of the regular production-LAN with other systems, would need to consider also at a minimum the requirements under Article 8(2)(b), and Recital 10.
+
+Status
+Final Q&A
+Answer prepared by
+Answer prepared by the Joint ESAs Q&A
+
+
+Question ID
+2025_7297
+Legal act
+Regulation (EU) No 2022/2554 (DORA Reg)
+Topic
+Register of information (DORA)
+Article
+28
+Paragraph
+9
+COM Delegated or Implementing Acts/RTS/ITS/GLs/Recommendations
+Regulation (EU) 2024/2956 - ITS on the register of information
+Article/Paragraph
+Annex I, Part 2, Instructions to complete template B_01.02 —List of financial entities within the scope of the register of information, Column Code B_01.02.0040
+Type of submitter
+Consultancy firm
+Subject matter
+The scope of the regulation described in Article 6 mismatches what is presented as an option in the Annex I, Part 2 of the same regulation
+Question
+Do financial entities must include non-financial entities within the same group in the Register of Information?
+
+If not, why is there an option to do so?
+
+Background on the question
+Commission Implementing Regulation (EU) 2024/2956 of 29 November 2024 Article 6 "Scope of the register of information at sub-consolidated and consolidated level" clearly states that "A register of information maintained and updated at sub-consolidated and consolidated levels shall include all financial entities and ICT intra-group service providers, which are part of the sub-group and group" which implies that non-financial entities and ICT-unrelated entities within the same group should not be included in the scope of the Registers of Information.
+
+However, Annex I Part 2 "Instructions to complete template B_01.02 —List of financial entities within the scope of the register of information" of the same regulation gives an option to select type of financial entity "24. non-financial entity: other" in column code B_01.02.0040.
+
+Which causes confusion - if there is no need to include non-financial entities in the scope of the Register of Information, why is there an option to select it?
+
+ 
+
+Submission date
+08/01/2025
+Final publishing date
+25/07/2025
+Final answer
+While the primary purpose of the template B_01.02 is to provide a complete overview of the financial entities that are part of the group and that are included in the group registers, it should also capture other non-financial group entities relevant to the provision of ICT services. This includes non-financial entities involved in the provision ICT services, such as intra-group service providers (also to be reported in B_05.01), and also non-financial entities that have signed contractual arrangements for the provision of ICT services on behalf of a financial entity in the group (also to be reported in B_03.01).
+
+Status
+Final Q&A
+Answer prepared by
+Answer prepared by the Joint ESAs Q&A
+
+
+Question ID
+2025_7313
+Legal act
+Regulation (EU) No 2022/2554 (DORA Reg)
+Topic
+Register of information (DORA)
+Article
+28
+Paragraph
+9
+COM Delegated or Implementing Acts/RTS/ITS/GLs/Recommendations
+Regulation (EU) 2024/2956 - ITS on the register of information
+Article/Paragraph
+Part 2 - Template specific instruction
+Type of submitter
+Other
+Subject matter
+Part 2 – Template specific instructions to template B_06.01
+Question
+Data point B_06.01.0050 is missing from the official ITS templates. Is this data point no longer applicable?
+
+Background on the question
+The data model (Data Model for DORA RoI.pdf) and the DORA related documents published in the reporting technical package 4.0 (Reporting framework 4.0 | European Banking Authority) include data point B_06.01.0050 (Criticality or importance assessment). However, column code B_06.01.0050 is missing from the ITS templates published in the Official Journal, and the column name “Criticality or importance assessment” is associated to column code B_06.01.0060.  It is unclear what column codes should be used.
+
+Submission date
+22/01/2025
+Final publishing date
+28/03/2025
+Final answer
+Whilst all the relevant data fields are present, there is numbering error in the numbering of the column codes in template-specific instructions to Template B_06.01 in the text published in the EU Official Journal with the value. In particular, B_06.01.0050 missing in the column codes resulting in the data fields being assigned erroneous column codes.
+
+The data points included in the reporting technical package v4.0 for the ITS on the Registers of information (Reporting framework 4.0 | European Banking Authority) should be considered for the reporting purposes. The data point model contains consecutive numbers of the data fields. The following numbering and the corresponding instructions/ fill-in options should be considered:
+
+B_06.01.0050 “Criticality or importance assessment”
+B_06.01.0060 “Reasons for criticality or importance”
+B_06.01.0070 “Date of the last assessment of criticality or importance”
+B_06.01.0080 “Recovery time objective of the function”
+B_06.01.0090 “Recovery point objective of the function”
+B_06.01.0100 “Impact of discontinuing the function”
+
+Status
+Final Q&A
+
+
+Question ID
+2024_7285
+Legal act
+Regulation (EU) No 2022/2554 (DORA Reg)
+Topic
+Register of information (DORA)
+Article
+28
+Paragraph
+9
+COM Delegated or Implementing Acts/RTS/ITS/GLs/Recommendations
+Regulation (EU) 2024/2956 - ITS on the register of information
+Article/Paragraph
+Part 2 - Template specific instruction
+Type of submitter
+Other
+Subject matter
+Template specific instructions – primary keys
+Question
+How to report data fields in case of missing values?
+
+Background on the question
+Some fields are marked as primary keys, and therefore they cannot be missing. However, in some cases the specific field might not be relevant for the entity (e.g., template B_03.02.0010)
+
+Submission date
+13/12/2024
+Final publishing date
+28/03/2025
+Final answer
+If financial entities are not able to fill some data fields that are mandatory, they can leave these data fields blank (report empty values), unless the instructions to the data fields or responses to Q&A. provide otherwise (please refer to responses to Q&A 140, 141, 142, 143, 144, 145, 146, 147, 148). These will be highlighted as data quality issues in the data quality feedback.
+
+However, financial entities cannot report empty values for the data fields identified as keys in the data model (Data Model for DORA Register of Information). If the financial entity cannot provide a value for a specific field that is identified as a primary key in the data model, financial entity should report ‘Not Applicable’ in that field.
+
+Status
+Final Q&A
+
+
+Question ID
+2024_7284
+Legal act
+Regulation (EU) No 2022/2554 (DORA Reg)
+Topic
+Register of information (DORA)
+Article
+28
+Paragraph
+9
+COM Delegated or Implementing Acts/RTS/ITS/GLs/Recommendations
+Regulation (EU) 2024/2956 - ITS on the register of information
+Article/Paragraph
+Part 2 - Template specific instruction
+Type of submitter
+Other
+Subject matter
+Template specific instructions – field B_05.02.0060 (Identification code of the recipient of sub-contracted ICT services)
+Question
+How to report data field B_05.02.0060 if the ICT third-party service provider is a direct provider (rank =1)?
+
+Background on the question
+The fill-in instructions for field B_05.02.0060 specify that the fields should be left blank if the ICT third-party service provider (template B_05.02.0030) is a direct ICT third-party service provider i.e. at ‘rank’ r = 1 (template B_05.02.0050). According to the data model, however,  this field is marked as a primary key and therefore cannot be missing or reported empty. It is unclear how to fill in the data field without triggering a data quality error. 
+
+Submission date
+13/12/2024
+Final publishing date
+28/03/2025
+Final answer
+According to Data Model for DORA Register of information, data field B_05.02.0060 is marked as a primary key value. As a result it should not be missing or reported empty. If the ICT third-party service provider (field B_05.02.0030) is a direct ICT third-party service provider i.e. at ‘rank’ r = 1 (field B_05.02.0050), field B_05.02.0060 should be filled in with the same value reported in B_05.02.0030.
+
+Status
+Final Q&A
+
+
+Question ID
+2024_7283
+Legal act
+Regulation (EU) No 2022/2554 (DORA Reg)
+Topic
+Register of information (DORA)
+Article
+28
+Paragraph
+9
+COM Delegated or Implementing Acts/RTS/ITS/GLs/Recommendations
+Regulation (EU) 2024/2956 - ITS on the register of information
+Article/Paragraph
+Part 2 - Template specific instruction
+Type of submitter
+Other
+Subject matter
+Template specific instructions – field B_05.01.0020 (Type of code to identify the ICT third-party service provider)
+Question
+How to report type of identification code in data field B_05.01.0020 when using codes other than LEI or EUID?
+
+Background on the question
+The fill-in instructions for field B_05.01.0020 in the ITS include 'Country Code’+Underscore+Type of Code’ as an option for non-LEI and non EUID code. The instructions for this data filed are not consistent with the instruction for other similar data filed, e.g. B_05.01.0040). 
+
+Submission date
+13/12/2024
+Final publishing date
+28/03/2025
+Final answer
+When reporting data field B_05.01.0020 financial entities should choose only the values from the closed set of options, without including the country code. One of the following values can be chosen:
+
+‘LEI’ for LEI
+‘EUID’ for EUID
+CRN for Corporate registration number
+VAT for VAT number
+PNR for Passport Number
+NIN for National Identity Number
+This is valid for all fields that make reference to B_05.01.0020.
+
+Only LEI or EUID can be used for legal persons, as identified in B_05.01.0070, whereas alternative code may be used only for an individual acting in a business capacity. Only LEI can be used for legal persons that are not established in the Union.
+
+Status
+
+
+Question ID
+2024_7282
+Legal act
+Regulation (EU) No 2022/2554 (DORA Reg)
+Topic
+Register of information (DORA)
+Article
+28
+Paragraph
+9
+COM Delegated or Implementing Acts/RTS/ITS/GLs/Recommendations
+Regulation (EU) 2024/2956 - ITS on the register of information
+Article/Paragraph
+Part 2 - Template specific instruction
+Type of submitter
+Other
+Subject matter
+Template specific instructions – field B_04.01.0040 (Identification code of the branch)
+Question
+How to report data field B_04.01.0040 if the financial entity is not a branch?
+
+Background on the question
+According to the ITS, the fields B_04.01.0040 is mandatory only if the financial entity making use of the ICT service(s) is a branch of a financial entity (B_04.01.0030). According to the data model, however,  this field is marked as a primary key and therefore cannot be missing or reported empty. It is unclear how to fill in the data field without triggering a data quality error when the financial entity reporting is not a branch
+
+Submission date
+13/12/2024
+Final publishing date
+28/03/2025
+Final answer
+According to the data model for the Register of Information, data field B_04.01.0040 is marked as a primary key value. As result it should not be missing or reported empty. The field should be filled in with ‘Not Applicable’ if the financial entity is not a branch (i.e., option 2 is selected in B_04.01.0030)
+
+Status
+Final Q&A
+
+
+Question ID
+2024_7281
+Legal act
+Regulation (EU) No 2022/2554 (DORA Reg)
+Topic
+Register of information (DORA)
+Article
+28
+Paragraph
+9
+COM Delegated or Implementing Acts/RTS/ITS/GLs/Recommendations
+Regulation (EU) 2024/2956 - ITS on the register of information
+Article/Paragraph
+Part 2 - Template specific instruction
+Type of submitter
+Other
+Subject matter
+Template specific instructions – field B_02.02.0160 (Location of management of the data)
+Question
+How to report data field B_02.02.0160 where the ICT service is not based or does not foresee data processing?
+
+Background on the question
+The ITS describes field B_02.02.0160 as mandatory only if the ICT service is based on or foresees data processing. According to the data model, however,  this field is marked as a primary key and therefore cannot be missing or reported empty. It is unclear how to fill in the data field without triggering a data quality error.
+
+Submission date
+13/12/2024
+Final publishing date
+28/03/2025
+Final answer
+According to the data model for the Register of Information, data field B_02.02.0160 is marked as a primary key value. As result it should not be missing or reported empty. The option ‘Not Applicable’ was added to the closed set of options. If the ICT service is not based / does not foresee data processing, then the option ‘Not Applicable’ should be used. The field should be filled in with the country of data processing otherwise.
+
+Status
+Final Q&A
+
+Question ID
+2024_7280
+Legal act
+Regulation (EU) No 2022/2554 (DORA Reg)
+Topic
+Register of information (DORA)
+Article
+28
+Paragraph
+9
+COM Delegated or Implementing Acts/RTS/ITS/GLs/Recommendations
+Regulation (EU) 2024/2956 - ITS on the register of information
+Article/Paragraph
+Part 2 - Template specific instruction
+Type of submitter
+Other
+Subject matter
+Template specific instructions – field B_02.02.0130 (Country of the governing law of the contractual arrangement)
+Question
+How to report field B_02.02.0150 where the ICT service is not related to storage of data (B_02.02.0140 = 'No')?
+
+Background on the question
+Field B_02.02.0150 is described in the ITS as mandatory if 'Yes' is reported in B_02.02.0140 (Is the ICT service related to (or does it foresee) storage of data (even temporarily)?). According to the data model, however, this field is marked as a primary key and therefore cannot be missing or reported empty. It is unclear how to fill in the data field without triggering a data quality error.
+
+Submission date
+13/12/2024
+Final publishing date
+28/03/2025
+Final answer
+According to the data model for the Register of Information, data field B_02.02.0150 is marked as a primary key value. As result it should not be missing or reported empty. The option ‘Not Applicable’ was added to the closed set of options. If the ICT service is not related to storage of data (B_02.02.0140 = 'No'), then the option ‘Not Applicable’ should be used. The field should be filled in with the country of storage of the data otherwise.
+
+Status
+Final Q&A
+
+
+Question ID
+2024_7279
+Legal act
+Regulation (EU) No 2022/2554 (DORA Reg)
+Topic
+Register of information (DORA)
+Article
+28
+Paragraph
+9
+COM Delegated or Implementing Acts/RTS/ITS/GLs/Recommendations
+Regulation (EU) 2024/2956 - ITS on the register of information
+Article/Paragraph
+Part 2 - Template specific instruction
+Type of submitter
+Other
+Subject matter
+Template specific instructions – field B_02.02.0130 (Country of the governing law of the contractual arrangement)
+Question
+How to report field B_02.02.0130 where the ICT service is not supporting a critical or important function considering that according to the data model this data field is a primary key?
+
+Background on the question
+The ITS describes data field B_02.02.0130 as mandatory only if the ICT service is supporting a critical or important function, introducing conditionality. According to the data model, however, field is marked as a primary key value. As a result it should not be missing or reported empty.
+
+It is unclear how to fill in the data field where the ICT service is not supporting critical or important functions without triggering a data quality error.
+
+Submission date
+13/12/2024
+Final publishing date
+28/03/2025
+Final answer
+According to the data model for the Register of Information data field B_02.02.0130 is marked as a primary key value. As a result it should not be missing or reported empty. The option 'Not Applicable' was added to the closed set of options. If the ICT service is not supporting a critical or important function (i.e., B_06.01.0060 = ‘No’ for the corresponding function identifier), then the option ‘Not Applicable’ should be used.
+
+The field should be filled in with the country of service otherwise.
+
+Status
+Final Q&A
+
+
+Question ID
+2024_7278
+Legal act
+Regulation (EU) No 2022/2554 (DORA Reg)
+Topic
+Register of information (DORA)
+Article
+28
+Paragraph
+9
+COM Delegated or Implementing Acts/RTS/ITS/GLs/Recommendations
+Regulation (EU) 2024/2956 - ITS on the register of information
+Article/Paragraph
+Part 2 - Template specific instruction
+Type of submitter
+Other
+Subject matter
+Template specific instructions - field B_01.02.0060 (LEI of the direct parent undertaking of the financial entity)
+Question
+What should be reported in case the financial entity does not have a direct parent undertaking (for example, is the parent undertaking itself) or reports the register on an individual basis?
+
+Background on the question
+Field B_01.02.0060 is described as mandatory with no conditionality in the fill-in option of the ITS. However, it is unclear how the field should be filled in if the entity is the direct parent undertaking itself or does not have a parent undertaking because it reports the register on an individual basis.
+
+Submission date
+13/12/2024
+Final publishing date
+28/03/2025
+Final answer
+If the financial entity does not have a direct parent undertaking, in field B_01.02.0060, it should report own LEI as already reported in B_01.02.0010 for the same entity, i.e., the LEI of an entity itself should be repeated.
+
+Status
+Final Q&A
+
+
+Question ID
+2024_7277
+Legal act
+Regulation (EU) No 2022/2554 (DORA Reg)
+Topic
+Register of information (DORA)
+Article
+28
+Paragraph
+9
+COM Delegated or Implementing Acts/RTS/ITS/GLs/Recommendations
+Regulation (EU) 2024/2956 - ITS on the register of information
+Article/Paragraph
+Part 2 - Template specific instruction
+Type of submitter
+Other
+Subject matter
+Template specific instructions – field B_01.02.0050 (Hierarchy of the financial entity within the group)
+Question
+What does ‘where applicable’ mean in the title of data field B_02.01.0050?  What should be reported in this field in case the entity that is being reported in this template is not a financial entity (i.e., option 22, 23, or 24 was selected in field B_01.02.0040 for the entity type)?
+
+Background on the question
+Field B_01.02.0050 is described as mandatory with no conditionality with the fill-in option provided in the ITS referring only to ‘financial entities’, but the name of the data field is “Hierarchy of the financial entity within the group (where applicable)”, which suggests optionality. The closed set of options refers only to financial entities, but there may be other entities reported in this template. However, since the field name includes “where applicable” it is unclear how non-financial entities should fill it in.
+
+Submission date
+13/12/2024
+Final publishing date
+28/03/2025
+Final answer
+Field B_01.02.0050 is mandatory and should be filled in also when the entity being reported in this template is not a financial entity, following the fill in instructions and choosing one options from the drop-down menu. Therefore, the reference to ‘where applicable’ in the name of the data field should be disregarded, and the drop-down values provided should be applied to all types of entities.
+
+Where an entity fulfils more than one options from the closed list, the higher- level option applicable to the entity should be selected.
+
+Status
+Final Q&A
+
+Question ID
+2024_7050
+Legal act
+Regulation (EU) No 2022/2554 (DORA Reg)
+Topic
+ICT-related incidents (management / classification / reporting)
+Article
+19
+COM Delegated or Implementing Acts/RTS/ITS/GLs/Recommendations
+Not applicable
+Article/Paragraph
+N/A
+Name of institution / submitter
+AFME
+Country of incorporation / residence
+Belgium
+Type of submitter
+Industry association
+Subject matter
+Duplicate ICT Incident Reporting
+Question
+Is duplicate incident reporting via the ECB SSM Cyber Incident Reporting Framework required, alongside DORA incident reporting under Article 19?
+
+Background on the question
+Significant credit institutions are required to notify the ECB of significant cyber incidents via their own SSM portal. These reports will duplicate reporting due under DORA, where the ECB is the competent authority. 
+
+Submission date
+03/04/2024
+Final publishing date
+11/12/2024
+Final answer
+Recital 51 of Regulation (EU) 2022/2554 clarifies that ICT-related incident reporting should be harmonised through the introduction of a requirement for all financial entities to report directly to their relevant competent authorities. Where a financial entity is subject to supervision by more than one national competent authority, Member States should designate a single competent authority as the addressee of such reporting. Credit institutions classified as significant in accordance with Article 6(4) of Council Regulation (EU) No 1024/2013 (19) should submit such reporting to the national competent authorities, which should subsequently transmit the report to the European Central Bank (ECB).
+
+Accordingly, ICT-related major incidents, including cyberincidents, affecting significant institutions in accordance with Article 6(4) of Council Regulation (EU) No 1024/2013 (19) should be classified and reported only under regulation (EU)2022/2554 and the related Technical Standards.
+
+Status
+Final Q&A
+Answer prepared by
+Answer prepared by the Joint ESAs Q&A
+
+
+Question ID
+2024_7096
+Legal act
+Regulation (EU) No 2022/2554 (DORA Reg)
+Topic
+Oversight framework of CTPPs
+Article
+31
+Paragraph
+8
+COM Delegated or Implementing Acts/RTS/ITS/GLs/Recommendations
+Not applicable
+Article/Paragraph
+/
+Type of submitter
+Credit institution
+Subject matter
+Exemption for Non-EU ICT Intra-group Service Providers
+Question
+Is it accurate to interpret that an ICT intra-group service provider established outside the EU (non-EU country), providing critical services to an EU-based financial institution (parent undertaking), falls within the exemption outlined in Article 31(8) of DORA, thereby exempting the need for establishing a subsidiary within the EU?
+
+Background on the question
+In accordance with the provision of Article 31(12) of DORA, financial institutions may use the services of ICT providers from third countries that have been designated as critical only if these providers have established a subsidiary in the EU within 12 months of the designation. However, paragraph 8 of the same article provides exceptions, which include ICT intra-group service providers. The third-party provider is part of a financial group with the parent undertaking established in an EU country, while the third-party provider itself is established in a non-EU country. The provider primarily offers services to financial institutions within the same group and in our assessment meets the criteria for an "ICT intra-group service provider" as defined in Article 3(20). The bank is inquiring whether, in this case, the third-party provider is required to establish a subsidiary in the EU. 
+
+Submission date
+29/05/2024
+Final publishing date
+11/12/2024
+Final answer
+In accordance with Article 31(8) point (iii) of DORA, the designation as critical ICT third-party provider referred to in Article 31(1) of DORA does not apply to ICT intra-group service providers. That provision does not make a distinction between intra-group providers established within the Union or in a third country 
+
+Since intra-group service providers as defined in Article 3(20) of DORA (which is “an undertaking that is part of a financial group and that provides predominantly ICT services to financial entities within the same group or to financial entities belonging to the same institutional protection scheme, including to their parent undertakings, subsidiaries, branches or other entities that are under common ownership or control”) are not subject to a designation as critical, the conditions for an application of Article 31(12) of DORA cannot be met for those providers, and the requirement for an EU-based subsidiary does not apply.
+
+Status
+Final Q&A
+Answer prepared by
+Answer prepared by the Joint ESAs Q&A
+
+
+Question ID
+2024_7047
+Legal act
+Regulation (EU) No 2022/2554 (DORA Reg)
+Topic
+ICT-related incidents (management / classification / reporting)
+Article
+18
+Paragraph
+3
+COM Delegated or Implementing Acts/RTS/ITS/GLs/Recommendations
+Not applicable
+Article/Paragraph
+Article 6 of Delegated Act on Classification of Major Incidents
+Name of institution / submitter
+AFME
+Country of incorporation / residence
+Belgium
+Type of submitter
+Industry association
+Subject matter
+Critical Services Affected
+Question
+Article 6 of the Delegated Act on the Classification of Major Incidents states that:
+
+"For the purpose of determining the criticality of the services affected as referred to in Article 18(1), point (e), of Regulation (EU) 2022/2554, financial entities shall assess whether the incident:
+(a) affects or has affected ICT services or network and information systems that support critical or important functions of the financial entity;
+(b) affects or has affected financial services provided by the financial entity that require authorisation, registration or that are supervised by competent authorities;
+(c) constitutes or has constituted a successful, malicious and unauthorised access to the network and information systems of the financial entity."
+
+Can you confirm please that ALL three of the components are cumulatively required to trigger the criteria on Critical Services Affected?
+
+Background on the question
+It is not clear whether ALL three of the components are required or whether ANY of the components would be sufficient to trigger the criteria. If the latter, we have major concerns that the second component will result in almost every incident at a regulated entity being classified as major, with the subsequent overreporting obscuring sight of those incidents which may have systemic impact. 
+
+Submission date
+03/04/2024
+Final publishing date
+11/12/2024
+Final answer
+Article 6 of Commission Delegated Regulation (EU) 2024/1772 provides that ‘financial entities shall assess whether the incident:
+
+(a) affects or has affected ICT services or network and information systems that support critical or important functions of the financial entity;
+
+(b) Affects or has affected financial services provided by the financial entity that require authorisation, registration or that are supervised by competent authorities;
+
+(c) constitutes or has constituted a successful, malicious and unauthorized access to the network and information systems of the financial entity.’
+
+In accordance with Article 8 of the Commission Delegated Regulation, an incident shall be considered major, and therefore be reported to the national competent authority, when it has affected critical services under Article 6 and when the additional specific conditions in Article 8 are met.
+
+Accordingly, for the purpose of classification of major ICT incidents under the Delegated Regulation and Article 19(1) of Regulation (EU) 2022/2554, an impact on any of the components listed in Article 6 of the Delegated Regulation should be considered as affecting critical services.
+
+Status
+Final Q&A
+Answer prepared by
+Answer prepared by the Joint ESAs Q&A
+

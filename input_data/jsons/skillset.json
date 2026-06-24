@@ -1,79 +1,108 @@
 {
-	"name": "__SKILLSET_NAME__",
-	"description": "Chunk documents and generate embeddings.",
-	"skills": [
-		{
-			"@odata.type": "#Microsoft.Skills.Text.SplitSkill",
-			"name": "eiopa_split_skill",
-			"description": "Split extracted document text into chunks.",
-			"context": "/document",
-			"textSplitMode": "pages",
-			"maximumPageLength": 2000,
-			"pageOverlapLength": 300,
-			"inputs": [
-				{
-					"name": "text",
-					"source": "/document/content"
-				}
-			],
-			"outputs": [
-				{
-					"name": "textItems",
-					"targetName": "pages"
-				}
-			]
-		},
-		{
-			"@odata.type": "#Microsoft.Skills.Text.AzureOpenAIEmbeddingSkill",
-			"name": "eiopa_embedding_skill",
-			"description": "Generate embeddings for chunked text.",
-			"context": "/document/pages/*",
-			"inputs": [
-				{
-					"name": "text",
-					"source": "/document/pages/*"
-				}
-			],
-			"outputs": [
-				{
-					"name": "embedding",
-					"targetName": "embedding"
-				}
-			],
-			"resourceUri": "__AZURE_OPENAI_ENDPOINT__",
-			"deploymentId": "__AZURE_OPENAI_EMBEDDING_DEPLOYMENT__",
-			"modelName": "__AZURE_OPENAI_EMBEDDING_MODEL__",
-			"apiKey": "__AZURE_OPENAI_API_KEY__"
-		}
-	],
-	"indexProjections": {
-		"selectors": [
-			{
-				"targetIndexName": "__INDEX_NAME__",
-				"parentKeyFieldName": "parent_id",
-				"sourceContext": "/document/pages/*",
-				"mappings": [
-					{
-						"name": "corpus",
-						"source": "/document/pages/*"
-					},
-					{
-						"name": "embedding",
-						"source": "/document/pages/*/embedding"
-					},
-					{
-						"name": "doc_name",
-						"source": "/document/metadata_storage_name"
-					},
-					{
-						"name": "regulation_reference",
-						"source": "/document/metadata_storage_path"
-					}
-				]
-			}
-		],
-		"parameters": {
-			"projectionMode": "skipIndexingParentDocuments"
-		}
-	}
+  "name": "__SKILLSET_NAME__",
+  "description": "Source-aware enrichment with WebApi custom legal chunking.",
+  "skills": [
+    {
+      "@odata.type": "#Microsoft.Skills.Custom.WebApiSkill",
+      "name": "eiopa_custom_legal_chunker",
+      "description": "Call custom API to produce article-aware legal chunks.",
+      "uri": "__CUSTOM_CHUNKER_URI__",
+      "httpMethod": "POST",
+      "timeout": "PT30S",
+      "batchSize": 1,
+      "context": "/document",
+      "inputs": [
+        {
+          "name": "text",
+          "source": "/document/content"
+        },
+        {
+          "name": "doc_name",
+          "source": "/document/metadata_storage_name"
+        },
+        {
+          "name": "source_path",
+          "source": "/document/metadata_storage_path"
+        },
+        {
+          "name": "file_data",
+          "source": "/document/file_data"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "legal_chunks",
+          "targetName": "legal_chunks"
+        },
+        {
+          "name": "doc_summary",
+          "targetName": "doc_summary"
+        },
+        {
+          "name": "corpus",
+          "targetName": "corpus"
+        },
+        {
+          "name": "page_row_num",
+          "targetName": "page_row_num"
+        },
+        {
+          "name": "chapter_num",
+          "targetName": "chapter_num"
+        },
+        {
+          "name": "article_num",
+          "targetName": "article_num"
+        },
+        {
+          "name": "annex_num",
+          "targetName": "annex_num"
+        }
+      ]
+    },
+    {
+      "@odata.type": "#Microsoft.Skills.Text.MergeSkill",
+      "name": "eiopa_content_for_embedding_merge",
+      "description": "Build content_for_embedding from summary plus legal chunks.",
+      "context": "/document",
+      "inputs": [
+        {
+          "name": "text",
+          "source": "/document/doc_summary"
+        },
+        {
+          "name": "itemsToInsert",
+          "source": "/document/legal_chunks/*"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "mergedText",
+          "targetName": "content_for_embedding"
+        }
+      ]
+    },
+    {
+      "@odata.type": "#Microsoft.Skills.Text.AzureOpenAIEmbeddingSkill",
+      "name": "eiopa_embedding_skill",
+      "description": "Generate embeddings for content_for_embedding.",
+      "context": "/document",
+      "inputs": [
+        {
+          "name": "text",
+          "source": "/document/content_for_embedding"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "embedding",
+          "targetName": "embedding"
+        }
+      ],
+      "resourceUri": "__AZURE_OPENAI_ENDPOINT__",
+      "deploymentId": "__AZURE_OPENAI_EMBEDDING_DEPLOYMENT__",
+      "modelName": "__AZURE_OPENAI_EMBEDDING_MODEL__",
+      "apiKey": "__AZURE_OPENAI_API_KEY__"
+    }
+  ]
 }

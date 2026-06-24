@@ -5,8 +5,9 @@
     "search_index_name": "__INDEX_NAME__",
     "source_data_fields": [
       "id",
+      "source_type",
       "doc_name",
-      "page_num",
+      "page_row_num",
       "corpus"
     ]
   }

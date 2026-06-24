@@ -12,13 +12,12 @@
 			"facetable": false
 		},
 		{
-			"name": "parent_id",
+			"name": "source_type",
 			"type": "Edm.String",
 			"searchable": true,
-			"analyzer": "keyword",
 			"filterable": true,
-			"sortable": false,
-			"facetable": false
+			"sortable": true,
+			"facetable": true
 		},
 		{
 			"name": "doc_name",
@@ -29,7 +28,7 @@
 			"facetable": true
 		},
 		{
-			"name": "page_num",
+			"name": "page_row_num",
 			"type": "Edm.Int32",
 			"filterable": true,
 			"sortable": true,
@@ -59,53 +58,7 @@
 			"facetable": true
 		},
 		{
-			"name": "question_id",
-			"type": "Edm.String",
-			"searchable": true,
-			"filterable": true,
-			"sortable": true,
-			"facetable": true
-		},
-		{
-			"name": "submitted_on",
-			"type": "Edm.DateTimeOffset",
-			"filterable": true,
-			"sortable": true,
-			"facetable": true
-		},
-		{
-			"name": "answered_on",
-			"type": "Edm.DateTimeOffset",
-			"filterable": true,
-			"sortable": true,
-			"facetable": true
-		},
-		{
-			"name": "regulation_reference",
-			"type": "Edm.String",
-			"searchable": true,
-			"filterable": true,
-			"sortable": true,
-			"facetable": true
-		},
-		{
-			"name": "qa_topic",
-			"type": "Edm.String",
-			"searchable": true,
-			"filterable": true,
-			"sortable": true,
-			"facetable": true
-		},
-		{
-			"name": "article_template",
-			"type": "Edm.String",
-			"searchable": true,
-			"filterable": false,
-			"sortable": false,
-			"facetable": false
-		},
-		{
-			"name": "background_question",
+			"name": "doc_summary",
 			"type": "Edm.String",
 			"searchable": true,
 			"filterable": false,
@@ -162,19 +115,25 @@
 				"name": "semantic_config",
 				"prioritizedFields": {
 					"titleField": {
-						"fieldName": "qa_topic"
+						"fieldName": "doc_name"
 					},
 					"prioritizedContentFields": [
 						{
 							"fieldName": "corpus"
+						},
+						{
+							"fieldName": "doc_summary"
 						}
 					],
 					"prioritizedKeywordsFields": [
 						{
-							"fieldName": "regulation_reference"
+							"fieldName": "source_type"
 						},
 						{
 							"fieldName": "article_num"
+						},
+						{
+							"fieldName": "annex_num"
 						}
 					]
 				}
