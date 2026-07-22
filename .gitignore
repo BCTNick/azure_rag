@@ -36,6 +36,14 @@ Thumbs.db
 
 # Local/generated data
 output_data/
+output/
+tmp/
+input_data/evaluation/*.log
+input_data/evaluation/*.err.log
+input_data/evaluation/backups/
+input_data/evaluation/notebooklm_batch_prompts/
+input_data/evaluation/notebook_lm_question_only.xlsx
 
+presentation/
 latex/
 run_chat - clean.py
