@@ -1,161 +1,245 @@
-# Azure Legal RAG Platform
+# Azure Legal RAG for DORA Q&A
 
-This repository provides a complete legal and regulatory RAG platform on Azure, with:
+This repository contains a legal retrieval-augmented generation (RAG) prototype for answering DORA-related regulatory questions. The system is designed around Azure AI Search, Azure OpenAI / Azure AI Foundry, and a Teams-ready FastAPI service.
 
-- robust ingestion pipelines,
-- hybrid retrieval and advanced query orchestration,
-- grounded answer generation with citations,
-- API and Teams-ready service interfaces,
-- trace logging for auditability.
+The project supports three main workflows:
 
-The system is designed for legal corpora such as regulations, directives, delegated acts, RTS/ITS material, and supervisory Q&A sets.
+- Build an indexed legal knowledge base from DORA regulations, technical standards, guidelines, opinions, and related public supervisory materials.
+- Ask grounded legal questions through a terminal chat, HTTP API, or Microsoft Teams bot endpoint.
+- Evaluate the RAG against official EIOPA/EBA Q&A benchmark answers and compare it with NotebookLM answers.
 
-## 1. Platform Capabilities
+> This is a research prototype for legal information retrieval and grounded answer generation. It is not a legal advice system and its answers should be reviewed against the cited sources.
 
-### Ingestion and indexing
+## Features
 
-Implemented:
+- Legal-structure-aware chunking for PDF and EUR-Lex HTML/XML-style files.
+- Row-preserving parsing for Excel workbooks.
+- Metadata-rich Azure AI Search index with `doc_name`, `source_type`, `page_row_num`, `chapter_num`, `article_num`, and `annex_num`.
+- Hybrid lexical + vector retrieval.
+- Query profiling for complexity, expertise, specificity, and explicit legal references.
+- Step-back query generation and query decomposition for complex questions.
+- Reciprocal-rank fusion, legal-aware heuristic reranking, and MMR-style context diversification.
+- Grounded answer generation with citations and trace IDs.
+- Teams-compatible Bot Framework endpoint.
+- RAG evaluation script with answer metrics and retrieval metrics.
+- NotebookLM answer evaluation script using the same answer-level judge rubric.
 
-- Local direct-push ingestion through src/local_ingester.py.
-- Legacy Azure-native ingestion experiment retained in src/ingester.py and JSON templates in input_data/jsons for possible future work.
-- Source-aware parsing for PDF, Excel, HTML, and text-like files.
-- Legal structure extraction (article, chapter, annex, page/row metadata).
-- Chunk enrichment with document summary and metadata.
-- Embeddings generated from summary + chunk content.
-- Azure AI Search indexing with vector-enabled schema.
-
-### Retrieval and reasoning
-
-Implemented:
-
-- Query classification by expertise and complexity.
-- Complexity mode none to skip retrieval for non-retrieval conversational turns.
-- Step-back query rewriting and query decomposition.
-- Multi-variant retrieval orchestration.
-- Hybrid lexical + vector retrieval in Azure AI Search.
-- Weighted fusion of retrieval signals.
-- Query-aware heuristic reranking based on fused retrieval score, lexical overlap, and explicit reference matches.
-- MMR-style evidence diversification.
-- Citation extraction from selected evidence.
-
-### Generation and interfaces
-
-Implemented:
-
-- Grounded response generation from retrieved evidence.
-- Terminal chat experience through `chat_terminal.py`.
-- Reusable one-turn answer API method: answer_once.
-- FastAPI service with:
-  - GET /healthz
-  - POST /rag/answer
-- Teams-ready architecture with traceable request handling.
-
-### Observability
-
-Implemented:
-
-- Terminal chat traces in `output_data/chat_traces/`.
-- Turn-level logs include:
-  - query classification,
-  - step-back transformation,
-  - retrieved context,
-  - prompt sent to the LLM,
-  - final response.
-
-## 2. Repository Structure
+## Repository Structure
 
 ```text
 azure_rag/
-  app.py
-  chat_terminal.py
-  ingest_local.py
-  ingest_indexer.py
-  PLAN.md
-  README.md
+  app.py                         # FastAPI API + Bot Framework endpoint for Teams
+  chat_terminal.py               # Local terminal chat with trace logging
+  chunk_preview.py               # Chunk documents locally without uploading to Azure
+  ingest_local.py                # Direct local ingestion into Azure AI Search
+  ingest_indexer.py              # Optional Azure Blob + Search indexer ingestion path
+  evaluate_rag.py                # RAG benchmark evaluation
+  evaluate_notebooklm.py         # NotebookLM answer evaluation
+  Dockerfile
   requirements.txt
   .env.example
+
   src/
-    config.py
-    chat.py
-    local_ingester.py
-    local_chunker.py
-    ingester.py
-    utils.py
+    config.py                    # Environment loading and Settings dataclass
+    chat.py                      # RAG query engine
+    local_chunker.py             # Legal chunking logic
+    local_ingester.py            # Direct-push ingestion path
+    ingester.py                  # Azure Blob + indexer path
+    utils.py                     # Azure REST/template helpers
+
   input_data/
-    jsons/
-      index.json
-      datasource.json
-      skillset.json
-      indexer.json
-      knowledge_source.json
-    local_storage/
-  output_data/
-    chat_traces/
-    ingestion_payloads/
-    eval_runs/
-  latex/
+    jsons/                       # Azure AI Search templates
+    local_storage/               # Source documents to index
+    evaluation/                  # Benchmark workbooks and NotebookLM dataset
+
+  output_data/                   # Generated traces, payloads, previews, eval runs
+  scripts/
+    deploy-aca.ps1               # Azure Container Apps deployment via ARM API
+    analyze_eval_results.py      # Optional evaluation analysis/figure generation
+
+  teams/
+    manifest.json
+    color.png
+    outline.png
+    eiopa-rag-teams-app.zip
 ```
 
-## 3. Runtime Entry Points
+Ignored local/generated folders include `output_data/`, `output/`, `tmp/`, `latex/`, `presentation/`, `.env`, and `.venv/`.
 
-### Terminal chat
+## Azure Services
 
-Run:
+The prototype uses these Azure services:
 
-```bash
-python chat_terminal.py
+- **Azure AI Search** for lexical search, vector search, semantic configuration, and metadata storage.
+- **Azure OpenAI / Azure AI Foundry** for embeddings, query profiling, step-back rewriting, document summaries, answer generation, and evaluation judging.
+- **Azure Storage / Blob Storage** for the optional Azure-native ingestion path.
+- **Azure Container Registry** for container images.
+- **Azure Container Apps** for hosting the API.
+- **Azure Bot Service** and **Microsoft Teams** for chat access inside an organization.
+- **Microsoft Entra ID** for deployment identity and bot identity.
+- **Log Analytics / Application Insights** for production observability.
+- **Azure Key Vault** is recommended for production secret management, although the prototype uses environment variables.
+
+## Installation
+
+Create and activate a virtual environment, then install dependencies:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
 ```
 
-Behavior:
+Copy the example environment file and fill in local values:
 
-- Loads environment settings.
-- Starts interactive legal chat.
-- Always writes trace logs under `output_data/chat_traces/`.
+```powershell
+Copy-Item .env.example .env
+```
 
-### Local direct-push ingestion
+Do not commit `.env`.
 
-Run:
+## Environment Variables
 
-```bash
+The main runtime variables are defined in `.env.example`.
+
+### Local
+
+- `LOCAL_STORAGE`: local folder containing source documents to index. Default: `input_data/local_storage`.
+
+### Azure AI Search
+
+- `AZURE_SEARCH_ENDPOINT`
+- `AZURE_SEARCH_ADMIN_KEY`
+- `AZURE_SEARCH_INDEX_NAME`
+- `AZURE_SEARCH_DATASOURCE_NAME`
+- `AZURE_SEARCH_SKILLSET_NAME`
+- `AZURE_SEARCH_INDEXER_NAME`
+- `AZURE_SEARCH_KNOWLEDGE_SOURCE_NAME`
+- `AZURE_SEARCH_KNOWLEDGE_BASE_NAME`
+
+### Azure OpenAI / Foundry
+
+- `AZURE_OPENAI_ENDPOINT`
+- `AZURE_OPENAI_API_KEY`
+- `AZURE_OPENAI_CHAT_DEPLOYMENT`
+- `AZURE_OPENAI_JUDGE_DEPLOYMENT`
+- `AZURE_OPENAI_EMBEDDING_DEPLOYMENT`
+- `AZURE_OPENAI_EMBEDDING_MODEL`
+- `AZURE_OPENAI_EMBEDDING_DIMENSIONS`
+
+The endpoint format expected by this code is:
+
+```text
+https://<resource>.openai.azure.com/openai/v1
+```
+
+### Azure Storage
+
+- `AZURE_STORAGE_ACCOUNT_NAME`
+- `AZURE_CONTAINER_NAME`
+- `AZURE_CONTAINER_SAS_TOKEN`
+- `AZURE_CONTAINER_SAS_URL`
+
+### Deployment
+
+- `AZURE_SUBSCRIPTION_ID`
+- `AZURE_TENANT_ID`
+- `AZURE_CLIENT_ID`
+- `AZURE_CLIENT_SECRET`
+- `AZURE_RESOURCE_GROUP`
+- `AZURE_LOCATION`
+- `AZURE_ACR_NAME`
+- `AZURE_IMAGE_TAG`
+- `ACA_ENV_NAME`
+- `ACA_APP_NAME`
+- `ACA_LOG_ANALYTICS_WORKSPACE`
+
+## Running The Main Workflows
+
+### 1. Preview Chunking Without Uploading
+
+Use this before ingestion when you want to inspect chunk quality and metadata:
+
+```powershell
+python chunk_preview.py
+```
+
+Output is written to:
+
+```text
+output_data/chunk_previews/<run_id>/
+```
+
+Each JSON preview is readable and does not include embeddings.
+
+### 2. Ingest Local Documents Into Azure AI Search
+
+This is the current trusted ingestion path:
+
+```powershell
 python ingest_local.py
 ```
 
-This is the current trusted ingestion path. It chunks local files, creates summaries and embeddings, uploads documents directly to Azure AI Search, and writes payload audits under `output_data/ingestion_payloads/`.
+It:
 
-### Azure indexer ingestion
+- reads files from `LOCAL_STORAGE`;
+- chunks supported files;
+- generates document summaries where appropriate;
+- embeds summary + chunk corpus;
+- uploads chunks directly to Azure AI Search;
+- writes readable ingestion payloads under `output_data/ingestion_payloads/<run_id>/`.
 
-Run:
+### 3. Run Optional Azure Indexer Ingestion
 
-```bash
+This path is kept for future Azure-native ingestion:
+
+```powershell
 python ingest_indexer.py
 ```
 
-This path uploads files to Azure Blob Storage, syncs the Azure AI Search datasource/skillset/indexer resources, and runs the indexer.
+It synchronizes local files to Azure Blob Storage, updates Search templates from `input_data/jsons/`, and runs the Azure AI Search indexer.
 
-### API service
+### 4. Chat In The Terminal
 
-Run:
-
-```bash
-uvicorn app:app --host 0.0.0.0 --port 8000
+```powershell
+python chat_terminal.py
 ```
 
-Endpoints:
+Terminal chat always enables trace logging. Traces are written to:
 
-- GET /healthz
-- POST /rag/answer
+```text
+output_data/chat_traces/
+```
+
+### 5. Run The API Locally
+
+```powershell
+uvicorn app:app --host 127.0.0.1 --port 8000
+```
+
+Health check:
+
+```text
+GET /healthz
+```
+
+RAG endpoint:
+
+```text
+POST /rag/answer
+```
 
 Example request:
 
 ```json
 {
-  "question": "What are the oversight obligations and does EIOPA apply?",
+  "question": "What is EIOPA's role under DORA?",
   "user_id": "user-123",
   "conversation_id": "conv-456"
 }
 ```
 
-Example response:
+Example response shape:
 
 ```json
 {
@@ -163,317 +247,245 @@ Example response:
   "citations": [
     {
       "source_id": 1,
-      "doc_name": "CELEX_32022R2554_EN_TXT.pdf",
-      "source_type": "pdf",
-      "page_row_num": "42",
-      "chapter_num": "III",
-      "article_num": "46",
+      "doc_name": "L_2022333EN.01000101.xml.html",
+      "source_type": "html",
+      "page_row_num": 1,
+      "chapter_num": 5,
+      "article_num": "31",
       "annex_num": "NA"
     }
   ],
-  "trace_id": "turn-7",
+  "trace_id": "turn-1",
   "profile": {
     "complexity": "high",
     "expertise": "expert",
     "specificity": "explicit",
-    "references": ["Article 46"]
+    "references": []
   },
   "active_query": "...",
   "retrieval_skipped": false
 }
 ```
 
-## 4. Environment Variables
+### 6. Run As A Teams Bot
 
-All variables are required unless explicitly documented as optional.
+`app.py` also exposes:
 
-### Core runtime
-
-- LOCAL_STORAGE
-
-### Azure AI Search
-
-- AZURE_SEARCH_ENDPOINT
-- AZURE_SEARCH_ADMIN_KEY
-- AZURE_SEARCH_INDEX_NAME
-- AZURE_SEARCH_DATASOURCE_NAME
-- AZURE_SEARCH_SKILLSET_NAME
-- AZURE_SEARCH_INDEXER_NAME
-- AZURE_SEARCH_KNOWLEDGE_SOURCE_NAME
-- AZURE_SEARCH_KNOWLEDGE_BASE_NAME
-
-### Azure OpenAI / Foundry
-
-- AZURE_OPENAI_ENDPOINT
-- AZURE_OPENAI_API_KEY
-- AZURE_OPENAI_CHAT_DEPLOYMENT
-- AZURE_OPENAI_EMBEDDING_DEPLOYMENT
-- AZURE_OPENAI_EMBEDDING_MODEL
-
-### Azure Storage
-
-- AZURE_STORAGE_ACCOUNT_NAME
-- AZURE_CONTAINER_NAME
-- AZURE_CONTAINER_SAS_TOKEN
-- AZURE_CONTAINER_SAS_URL
-
-### Where To Get Each .env Variable
-
-Use this section to populate .env safely.
-
-Deployment and container variables:
-
-- AZURE_SUBSCRIPTION_ID
-  - Azure Portal: Subscriptions > your subscription > Overview > Subscription ID
-- AZURE_TENANT_ID
-  - Azure Portal: Microsoft Entra ID > Overview > Tenant ID
-- AZURE_CLIENT_ID
-  - Azure Portal: Microsoft Entra ID > App registrations > your app > Application (client) ID
-- AZURE_CLIENT_SECRET
-  - Azure Portal: Microsoft Entra ID > App registrations > your app > Certificates & secrets > Client secrets
-  - Store secret value only in local .env
-- AZURE_RESOURCE_GROUP
-  - Azure Portal: Resource groups > choose/create group name
-- AZURE_LOCATION
-  - Use the region where your core services run, for example westeurope
-- AZURE_ACR_NAME
-  - Azure Portal: Container registries > registry name
-  - Must be globally unique, lowercase letters/numbers
-- AZURE_IMAGE_TAG
-  - Your release label, for example v1, v2, 2026-06-16
-- ACA_ENV_NAME / ACA_APP_NAME
-  - Names you choose for Azure Container Apps environment and app
-- ACA_LOG_ANALYTICS_WORKSPACE
-  - Name for Log Analytics workspace used by Container Apps environment
-- APPSERVICE_PLAN_NAME / APPSERVICE_WEBAPP_NAME
-  - Names you choose for App Service plan and web app
-
-Service principal and permissions setup (required for API-based deployment scripts):
-
-1. Create an app registration
-  - Azure Portal > Microsoft Entra ID > App registrations > New registration
-  - Name it, for example legal-rag-deployer
-2. Collect identity values
-  - AZURE_TENANT_ID from Microsoft Entra ID > Overview > Tenant ID
-  - AZURE_CLIENT_ID from the app registration > Overview > Application (client) ID
-3. Create a client secret
-  - App registration > Certificates & secrets > New client secret
-  - Copy the secret Value immediately and store it in AZURE_CLIENT_SECRET
-4. Grant deployment permissions to this app
-  - Recommended scope: Resource groups > your group > Access control (IAM)
-  - Select Add role assignment
-  - Required role: Contributor (built-in)
-  - Depending on portal UX/version, Contributor can appear under Job function roles or under Privileged administrator roles.
-  - In the role picker, choose the role with exact name Contributor and description:
-    Grants full access to manage all resources, but does not allow you to assign roles in Azure RBAC.
-  - Do not choose similarly named roles such as:
-    - Contributor DataActions
-    - User Access Administrator
-    - Service-specific contributor roles (for example Search Service Contributor, Storage Blob Data Contributor)
-  - Assign access to: User, group, or service principal
-  - Select members: search for your app registration name and select it
-  - Save
-5. Wait a few minutes for role propagation, then run the deployment script
-
-Pre-deployment identity checklist (exactly what must be in .env):
-
-- AZURE_TENANT_ID
-  - Must be the Tenant ID GUID (not tenant name)
-  - Source: Microsoft Entra ID > Overview > Tenant ID
-- AZURE_CLIENT_ID
-  - Must be the Application (client) ID GUID (not app display name)
-  - Source: App registrations > your app > Overview > Application (client) ID
-- AZURE_CLIENT_SECRET
-  - Must be the client secret Value (not Secret ID)
-  - Source: App registrations > your app > Certificates & secrets
-- AZURE_SUBSCRIPTION_ID
-  - Must be the target subscription GUID where resources are created
-
-Quick sanity checks before running deployment:
-
-- AZURE_TENANT_ID, AZURE_CLIENT_ID, AZURE_SUBSCRIPTION_ID should all look like GUIDs in the form xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx.
-- AZURE_CLIENT_ID should never be a text label like my-app-id or eiopa-client-id.
-- Role assignment must be on the same target scope where you deploy (recommended: target resource group).
-
-If you hit AADSTS700016 (application not found):
-
-1. Verify AZURE_CLIENT_ID is copied from Application (client) ID, not from app name.
-2. Verify AZURE_TENANT_ID is the tenant that contains that app registration.
-3. If the app was just created, wait 1-3 minutes and retry.
-4. Recreate AZURE_CLIENT_SECRET if needed and update .env.
-
-Notes:
-
-- The deployment app registration is only for provisioning resources (ARM API calls).
-- It is separate from your runtime app and separate from the Docker image itself.
-- Do not commit AZURE_CLIENT_SECRET to git.
-
-Azure AI Search variables:
-
-- AZURE_SEARCH_ENDPOINT
-  - Azure Portal: AI Search service > Overview > URL
-- AZURE_SEARCH_ADMIN_KEY
-  - Azure Portal: AI Search service > Keys > Primary admin key
-- AZURE_SEARCH_INDEX_NAME
-- AZURE_SEARCH_DATASOURCE_NAME
-- AZURE_SEARCH_SKILLSET_NAME
-- AZURE_SEARCH_INDEXER_NAME
-- AZURE_SEARCH_KNOWLEDGE_SOURCE_NAME
-- AZURE_SEARCH_KNOWLEDGE_BASE_NAME
-  - Use the resource names already created in your search service, or keep the defaults used by this repo (index, datasource, skillset, indexer, knowledge-source, knowledge-base)
-
-Azure OpenAI variables:
-
-- AZURE_OPENAI_ENDPOINT
-  - Azure Portal: Azure OpenAI resource > Keys and Endpoint > Endpoint
-  - Keep the format expected by this repo: https://<resource>.openai.azure.com/openai/v1
-- AZURE_OPENAI_API_KEY
-  - Azure Portal: Azure OpenAI resource > Keys and Endpoint > Key 1 or Key 2
-- AZURE_OPENAI_CHAT_DEPLOYMENT
-- AZURE_OPENAI_EMBEDDING_DEPLOYMENT
-- AZURE_OPENAI_EMBEDDING_MODEL
-  - Azure AI Foundry / Azure OpenAI Studio > Deployments > deployment names and model names
-
-Azure Storage variables:
-
-- AZURE_STORAGE_ACCOUNT_NAME
-  - Azure Portal: Storage account > Overview > Name
-- AZURE_CONTAINER_NAME
-  - Azure Portal: Storage account > Data storage > Containers
-- AZURE_CONTAINER_SAS_TOKEN
-- AZURE_CONTAINER_SAS_URL
-  - Azure Portal: Storage account > Containers > select container > Generate SAS
-  - SAS token is the query string value
-  - SAS URL is the full URL including SAS query
-
-Runtime variables:
-
-- LOCAL_STORAGE
-  - Local path used by ingestion; inside the container, use `/app/input_data/local_storage`.
-
-## 5. How The Query Pipeline Works
-
-1. Classify user query into profile fields:
-   - complexity,
-   - expertise,
-   - specificity,
-   - explicit legal references.
-2. If complexity is none, skip retrieval and answer in non-citation mode.
-3. Build one or more retrieval variants (base query, references, step-back, decomposed parts).
-4. Run lexical and vector retrieval for each variant.
-5. Fuse lexical and vector rankings.
-6. Apply legal-aware reranking using metadata and text overlap.
-7. Select diverse final evidence through MMR.
-8. Build grounded prompt and generate final answer with citations.
-
-## 6. Ingestion Quality Profile
-
-The ingestion layer preserves legal explainability by keeping retrieval metadata attached to each chunk:
-
-- doc_name
-- source_type
-- page_row_num
-- chapter_num
-- article_num
-- annex_num
-- doc_summary
-- corpus
-- embedding
-
-Excel content is row-preserving; PDF and HTML favor legal-structure-aware chunking with fallback chunking for robustness.
-
-## 7. Trace Logging
-
-Terminal chat always writes per-session logs in `output_data/chat_traces/`:
-
-- chat_YYYYMMDD_HHMMSS.txt
-
-Each turn captures:
-
-- user query,
-- classification,
-- step-back query,
-- retrieval output,
-- final prompt payload,
-- model answer.
-
-This supports legal auditability and retrieval diagnostics.
-
-## 8. Teams Deployment Readiness
-
-The platform is structured for direct Teams channel integration through an API-facing bot service:
-
-- deterministic request entrypoint,
-- stable answer contract,
-- citation and trace ID support,
-- Azure-hostable FastAPI backend.
-
-Recommended Azure hosting stack:
-
-- Azure Container Apps,
-- Azure Bot Service,
-- Microsoft Teams app package,
-- Key Vault + Application Insights.
-
-## 9. Install
-
-```bash
-pip install -r requirements.txt
+```text
+POST /api/messages
 ```
 
-## 10. Docker Image
+This is the Bot Framework endpoint used by Azure Bot Service / Microsoft Teams. The Teams app package lives in `teams/`.
+
+For local API testing, use `/rag/answer`. For Teams deployment, configure the bot messaging endpoint to:
+
+```text
+https://<your-host>/api/messages
+```
+
+## Retrieval And Metadata
+
+The Azure AI Search schema is defined in `input_data/jsons/index.json`.
+
+Searchable fields include:
+
+- `id`
+- `source_type`
+- `doc_name`
+- `article_num`
+- `annex_num`
+- `doc_summary`
+- `corpus`
+- `embedding` for vector search
+
+Filterable/sortable metadata includes:
+
+- `source_type`
+- `doc_name`
+- `page_row_num`
+- `chapter_num`
+- `article_num`
+- `annex_num`
+
+Important detail: `page_row_num` and `chapter_num` are numeric fields. They are filterable, sortable, and facetable, but they are not lexical-searchable. The current chat engine does not automatically apply metadata filters for prompts such as “page 54”; it retrieves through hybrid search and reranking.
+
+## RAG Evaluation
+
+The main benchmark is:
+
+```text
+input_data/evaluation/dora_qas_eiopa_eba_benchmark.xlsx
+```
+
+Expected sheet:
+
+```text
+benchmark_qas
+```
+
+The script:
+
+```powershell
+python evaluate_rag.py
+```
+
+does the following:
+
+- asks each benchmark question to the current RAG;
+- stores the RAG answer, citations, trace ID, query profile, and retrieval diagnostics;
+- calls the judge deployment from `AZURE_OPENAI_JUDGE_DEPLOYMENT`;
+- scores answer quality with answer correctness, faithfulness, answer relevance, completeness, citation precision, citation recall, and unsupported-claims score;
+- evaluates retrieval metrics when Article or Template references are available;
+- writes a fresh workbook under `output_data/eval_runs/<run_id>/`.
+
+Useful options:
+
+```powershell
+python evaluate_rag.py --limit 1
+python evaluate_rag.py --limit 5 --no-judge
+```
+
+The evaluation intentionally assumes that the official EIOPA/EBA Q&A files are not part of the indexed knowledge base, so the RAG cannot simply retrieve benchmark answers.
+
+## NotebookLM Evaluation
+
+The NotebookLM comparison dataset is:
+
+```text
+input_data/evaluation/notebook_lm.xlsx
+```
+
+Expected sheet:
+
+```text
+notebook_lm_answers
+```
+
+Run:
+
+```powershell
+python evaluate_notebooklm.py
+```
+
+This script evaluates existing NotebookLM answers with the same answer-level judge rubric used for the RAG evaluation. It does not automate NotebookLM through a browser; it only judges answers already collected in the workbook.
+
+Useful options:
+
+```powershell
+python evaluate_notebooklm.py --limit 1
+python evaluate_notebooklm.py --dry-run
+python evaluate_notebooklm.py --question-id "DORA 253 - 3393"
+```
+
+Output is written to:
+
+```text
+output_data/eval_runs/<run_id>/notebooklm_answer_evaluated_<run_id>.xlsx
+```
+
+## Analyze Evaluation Results
+
+After a RAG evaluation run, optional aggregate tables and figures can be generated with:
+
+```powershell
+python scripts/analyze_eval_results.py --input output_data/eval_runs/<run_id>/<evaluated_workbook>.xlsx
+```
+
+By default, the script writes analysis outputs to the evaluation run folder and figure files under `latex/images/evaluation/`.
+
+## Docker
 
 Build locally:
 
-```bash
+```powershell
 docker build -t legal-rag-api:local .
 ```
 
 Run locally:
 
-```bash
+```powershell
 docker run --rm -p 8000:8000 --env-file .env legal-rag-api:local
 ```
 
-## 11. Azure Deployment Scripts (ARM API, No Azure CLI)
+The container starts:
 
-Ready-to-run scripts are included:
+```text
+uvicorn app:app --host 0.0.0.0 --port 8000
+```
 
-- scripts/deploy-aca.ps1
+## Azure Deployment
 
-Both scripts:
-
-- create a resource group,
-- create Azure Container Registry through ARM API,
-- build and push the Docker image,
-- deploy the container resource to Azure through ARM API,
-- set all required runtime environment variables.
-
-Authentication model:
-
-- The scripts request a Microsoft Entra OAuth token using:
-  - AZURE_TENANT_ID
-  - AZURE_CLIENT_ID
-  - AZURE_CLIENT_SECRET
-- They call Azure management REST APIs directly (management.azure.com).
-- They do not call az CLI commands.
-
-### Azure Container Apps
+The deployment script is:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\deploy-aca.ps1
 ```
 
-Important:
+The script uses Azure Resource Manager APIs and environment variables. It does not require the Azure CLI for provisioning.
 
-- Fill all required variables in local .env before running scripts.
-- For auth, verify AZURE_TENANT_ID, AZURE_CLIENT_ID, AZURE_CLIENT_SECRET are from the same app registration and tenant.
-- Do not commit .env or client secret values.
-- Grant exactly one role to the deployment app registration: Contributor on the target resource group.
-- The app still requires all runtime environment variables because settings are validated at startup.
+It can:
 
-## 12. Notes
+- create or update the resource group;
+- create or use Azure Container Registry;
+- build and push the Docker image;
+- create a Log Analytics workspace;
+- create a Container Apps environment;
+- deploy the FastAPI container app with external ingress.
 
-- The system is designed for evidence-grounded legal assistance, not legal advice automation.
-- Final decisions should be validated against the cited primary legal texts.
-- The strongest output quality comes from high-quality source documents and metadata-rich chunking.
+Before running deployment, verify:
+
+- `.env` is filled locally and is not committed;
+- `AZURE_TENANT_ID`, `AZURE_CLIENT_ID`, and `AZURE_SUBSCRIPTION_ID` are GUIDs;
+- `AZURE_CLIENT_SECRET` is the secret value, not the secret ID;
+- the deployment app registration has Contributor on the target resource group;
+- the container app receives all runtime variables required by `src/config.py`.
+
+## Development Checks
+
+Compile the Python entry points:
+
+```powershell
+python -m py_compile app.py chat_terminal.py chunk_preview.py ingest_local.py ingest_indexer.py evaluate_rag.py evaluate_notebooklm.py src/config.py src/chat.py src/local_chunker.py src/local_ingester.py src/ingester.py src/utils.py
+```
+
+Smoke-test the API:
+
+```powershell
+uvicorn app:app --host 127.0.0.1 --port 8000
+```
+
+Then open:
+
+```text
+http://127.0.0.1:8000/healthz
+```
+
+## Git Hygiene
+
+Do not commit:
+
+- `.env`
+- `.venv/`
+- `output_data/`
+- `output/`
+- `tmp/`
+- generated logs
+- local LaTeX build outputs
+- local presentation render outputs
+
+Commit intentionally:
+
+- source code;
+- Azure Search templates in `input_data/jsons/`;
+- benchmark datasets in `input_data/evaluation/`;
+- Teams manifest assets in `teams/`;
+- `README.md` and `.env.example`.
+
+## Notes
+
+- The terminal chat and API do not run ingestion implicitly.
+- Ingestion is always an explicit script.
+- Terminal chat always writes trace logs.
+- The direct local ingester is the trusted ingestion path for the current prototype.
+- The Azure indexer path is preserved for future production-style ingestion.
+- The evaluation scripts write new workbooks and do not overwrite the benchmark source files unless explicitly requested by script options.
